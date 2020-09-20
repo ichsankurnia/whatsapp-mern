@@ -3,6 +3,7 @@ import express from "express";
 import mongoose from "mongoose";
 import Messages from "./dbMessages.js";
 import Pusher from "pusher"
+import cors from "cors";
 
 // app config
 const app = express()
@@ -20,6 +21,13 @@ const pusher = new Pusher({
 // middleware
 app.use(express.json())
 
+app.use(cors())
+// app.use((req, res, next) => {
+//     res.setHeader("Access-Control-Allow-Origin", "*");
+//     res.setHeader("Access-Control-Allow-Headers", "*")
+//     next();
+// })
+
 
 // DB config
 const dbName = 'whatsappdb'
@@ -27,6 +35,7 @@ const dbUser = 'ichsankurnia'
 const dbPass = 'ichsan14'
 
 const connection_url = `mongodb+srv://${dbUser}:${dbPass}@cluster0.ynrf1.mongodb.net/${dbName}?retryWrites=true&w=majority`
+
 const mongooOption = {
     useCreateIndex: true,
     useNewUrlParser: true,
@@ -35,6 +44,31 @@ const mongooOption = {
 
 mongoose.connect(connection_url, mongooOption, (err) => {
     console.log(err)
+})
+
+const db = mongoose.connection
+
+db.once("open", () => {
+    console.log("DB connected")
+
+    const msgCollection = db.collection("messagecontents")
+    const changeStream = msgCollection.watch()
+    
+    changeStream.on("change", (change) => {
+        console.log(change)
+
+        if(change.operationType === "insert"){
+            const { message, name, timestamp, received } = change.fullDocument
+            pusher.trigger("messages", "inserted", {
+                message: message,
+                name: name,
+                timestamp: timestamp,
+                received: received
+            })
+        }else{
+            console.log("operation type not inserted")
+        }
+    })
 })
 
 
