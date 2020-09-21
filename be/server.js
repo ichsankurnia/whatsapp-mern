@@ -4,15 +4,19 @@ import mongoose from "mongoose";
 import Messages from "./dbMessages.js";
 import Pusher from "pusher"
 import cors from "cors";
+import dotenv from "dotenv"
+
 
 // app config
+dotenv.config()
 const app = express()
 const port = process.env.PORT || 9000
 
+const { PUSHER_ID, PUSHER_KEY, PUSHER_SECRET } = process.env
 const pusher = new Pusher({
-    appId: '1074553',
-    key: '4495e494430a0c853b2a',
-    secret: '216e53e2735a0b0f5704',
+    appId: PUSHER_ID,
+    key: PUSHER_KEY,
+    secret: PUSHER_SECRET,
     cluster: 'ap1',
     encrypted: true
 });
@@ -30,11 +34,9 @@ app.use(cors())
 
 
 // DB config
-const dbName = 'whatsappdb'
-const dbUser = 'ichsankurnia'
-const dbPass = 'ichsan14'
+const { DB_NAME, DB_USER, DB_PASS } = process.env
 
-const connection_url = `mongodb+srv://${dbUser}:${dbPass}@cluster0.ynrf1.mongodb.net/${dbName}?retryWrites=true&w=majority`
+const connection_url = `mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.ynrf1.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`
 
 const mongooOption = {
     useCreateIndex: true,
@@ -45,6 +47,7 @@ const mongooOption = {
 mongoose.connect(connection_url, mongooOption, (err) => {
     console.log(err)
 })
+
 
 const db = mongoose.connection
 
@@ -105,8 +108,6 @@ app.post("/messages/new", async (req, res) => {
     } catch (error) {
         res.status(500).send(error)
     }
-
-    
 })
 
 
