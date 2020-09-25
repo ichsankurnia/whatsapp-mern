@@ -18,10 +18,14 @@ const userSchema = mongoose.Schema({
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
         default: "",
     },
-    fullname: {
-        type: String,
-        default: ""
+    profile: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "c_profiles"
     },
+    contact: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "c_contacts"
+    }],
     created_at: {
         type: String,
         default: moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A") 
@@ -34,4 +38,4 @@ const userSchema = mongoose.Schema({
 
 
 // Collection
-export default mongoose.model('c_user', userSchema)
+export default mongoose.model('c_users', userSchema)
