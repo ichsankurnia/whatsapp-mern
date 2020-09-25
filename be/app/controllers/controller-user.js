@@ -1,4 +1,5 @@
 import User from "../../models/user.js"
+import moment from 'moment';   
 import { encryptAes } from "../helper/encrypt.js";
 
 
@@ -55,6 +56,65 @@ const getAllUser = async (req, res) => {
 }
 
 
+const getOneUser = async (req, res) => {
+    try {
+        const { id } = req.params
+        const data = await User.findById(id)
+
+        console.log(data)
+        if(data){
+            res.status(200).send({code: 0, message: "success get user by id", data: data})
+        }else{
+            res.status(400).send({code: 1, message: `data with id '${id}' doesn't exist`, data: data})
+        }
+    } catch (error) {
+        return res.status(400).json({code: 1, message: error.message, data: null})
+    }
+}
+
+
+const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params
+        
+        if(req.body.password){
+            req.body.password = await encryptAes(req.body.password)
+        }
+
+        req.body.updated_at = moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A")
+        // const data = await User.findOneAndUpdate({ _id: req.params.id }, req.body)
+        const data = await User.findByIdAndUpdate(id, (req.body))
+
+        if(data){
+            const updateData = await User.findById(id)
+            return res.status(202).json({code: 0, message: "success update user", data: updateData})
+        }else{
+            return res.status(400).json({code: 1, message: `fail update user, data with id '${id}' doesn't exist`, data: null})
+        }
+    } catch (error) {
+        return res.status(400).json({code: 1, message: error.message, data: null})
+    }
+}
+
+
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        const data = await User.findByIdAndRemove(id)
+
+        console.log(data)
+        if(data){
+            return res.status(200).json({code: 0, message: "success delete user", data: data})
+        }else{
+            return res.status(400).json({code: 1, message: `fail delete user, data with id '${id}' doesn't exist`, data: null})
+        }
+    } catch (error) {
+        return res.status(400).json({code: 1, message: error.message, data: null})
+    }
+}
+
+
 const truncateUser = async (req, res) => {
     try {
         await User.deleteMany({})
@@ -66,4 +126,12 @@ const truncateUser = async (req, res) => {
 }
 
 
-export { registerUser, createNewUser, getAllUser, truncateUser }
+export { 
+    registerUser, 
+    createNewUser, 
+    getAllUser, 
+    getOneUser, 
+    updateUser, 
+    deleteUser,
+    truncateUser 
+}
