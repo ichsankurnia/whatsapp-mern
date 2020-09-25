@@ -1,16 +1,20 @@
 // Importing
 import express from "express";
 import mongoose from "mongoose";
-import Messages from "./dbMessages.js";
 import Pusher from "pusher"
 import cors from "cors";
 import dotenv from "dotenv"
+import moment from 'moment';
+import "moment-timezone"
+
+import Messages from "./dbMessages.js";
+import route from "./routes.js";
 
 
 // app config
-dotenv.config()
 const app = express()
 const port = process.env.PORT || 9000
+dotenv.config()
 
 const { PUSHER_ID, PUSHER_KEY, PUSHER_SECRET } = process.env
 const pusher = new Pusher({
@@ -20,6 +24,8 @@ const pusher = new Pusher({
     cluster: 'ap1',
     encrypted: true
 });
+
+moment.tz.setDefault("Asia/Jakarta");
 
 
 // middleware
@@ -109,6 +115,8 @@ app.post("/messages/new", async (req, res) => {
         res.status(500).send(error)
     }
 })
+
+app.use('/api/v1/', route)
 
 
 // listen
