@@ -80,8 +80,9 @@ const updateUser = async (req, res) => {
         if(req.body.password){
             req.body.password = await encryptAes(req.body.password)
         }
-
+        
         req.body.updated_at = moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A")
+
         // const data = await User.findOneAndUpdate({ _id: req.params.id }, req.body)
         const data = await User.findByIdAndUpdate(id, (req.body))
 
