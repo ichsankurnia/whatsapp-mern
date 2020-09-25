@@ -3,6 +3,9 @@ import {
     registerUser,
     createNewUser, 
     getAllUser, 
+    getOneUser,
+    updateUser,
+    deleteUser,
     truncateUser 
 } from "./app/controllers/controller-user.js";
 import login from "./app/middlewares/authenticate.js"
@@ -17,7 +20,10 @@ Router.post('/user/sign-up', registerUser)
 Router.post('/user/sign-in', login)
 
 Router.get('/user', getAllUser)
+Router.get('/user/:id', getOneUser)
 Router.post('/user', createNewUser)
+Router.put('/user/:id', updateUser)
+Router.delete('/user/:id', deleteUser)
 Router.delete('/truncate-user', truncateUser)
 
 export default Router
