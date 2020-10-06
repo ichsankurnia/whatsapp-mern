@@ -1,5 +1,6 @@
 import User from "../../models/user.js"
 import Profile from "../../models/profile.js"
+import Contact from "../../models/contact.js";
 import moment from 'moment';   
 import { encryptAes } from "../helper/encrypt.js";
 
@@ -85,7 +86,28 @@ const getAllUser = async (req, res) => {
 const getOneUser = async (req, res) => {
     try {
         const { id } = req.params
-        const data = await User.findById(id).select(['_id', 'username', 'password', 'email', 'contact']).populate("profile", ['fullname', 'phone_number', 'photo', 'about'], "c_profiles")
+        const data = await User.findById(id).select(['_id', 'username', 'password', 'email']).populate([
+            {
+                path: "profile",
+                select: ['fullname', 'phone_number', 'photo', 'about'],
+                model: "c_profiles"
+            },
+            {
+                path: "contacts",
+                select: ['contact'],
+                model: "c_contacts",
+                populate: {
+                    path: 'contact',
+                    select: ['username', 'email'],
+                    model: 'c_users',
+                    populate: {
+                        path: 'profile',
+                        select: ['fullname', 'phone_number'],
+                        model: 'c_profiles'
+                    }
+                }
+            }
+        ])
 
         if(data){
             res.status(200).send({code: 0, message: "success get user by id", data: data})
@@ -132,6 +154,7 @@ const deleteUser = async (req, res) => {
 
         if(data){
             await Profile.findOneAndDelete({ user_id: id })
+            await Contact.findOneAndDelete({ owner : _id })
 
             return res.status(200).json({code: 0, message: "success delete user", data: data})
         }else{
@@ -147,6 +170,7 @@ const truncateUser = async (req, res) => {
     try {
         await User.deleteMany({})
         await Profile.deleteMany({})
+        await Contact.deleteMany({})
 
         res.status(200).json({code: 0, message: "success truncate user collection", data: null})
     } catch (error) {
