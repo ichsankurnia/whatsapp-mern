@@ -11,6 +11,11 @@ import {
 } from "./app/controllers/controller-user.js";
 import login from "./app/middlewares/authenticate.js"
 import isAuthenticate from "./app/middlewares/verify-token.js"
+import { 
+    addContact, 
+    getContactbyUserId, 
+    deleteContact 
+} from "./app/controllers/controller-contact.js";
 
 
 const Router = express.Router();
@@ -31,6 +36,12 @@ Router.delete('/truncate-user', truncateUser)
 
 // Profile
 Router.put('/user/profile/:user_id', updateProfile)
+
+
+// Contact
+Router.get('/contact/:user_id', getContactbyUserId)
+Router.post('/contact', addContact)
+Router.delete('/contact', deleteContact)
 
 
 
