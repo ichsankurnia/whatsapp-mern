@@ -22,9 +22,13 @@ const userSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_profiles"
     },
-    contact: [{
+    contacts: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_contacts"
+    }],
+    conversations: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "c_conversations"
     }],
     created_at: {
         type: String,
