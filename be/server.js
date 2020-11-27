@@ -11,10 +11,21 @@ import Messages from "./dbMessages.js";
 import route from "./routes.js";
 
 
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
 // app config
 const app = express()
 const port = process.env.PORT || 9000
 dotenv.config()
+
+var server = require('http').createServer(app);
+var io = require('socket.io')(server, {
+    cors: {
+        origin: '*',
+    }
+});
+
 
 const { PUSHER_ID, PUSHER_KEY, PUSHER_SECRET } = process.env
 const pusher = new Pusher({
@@ -84,6 +95,21 @@ db.once("open", () => {
 // ????
 
 
+app.post('/test', async (req, res) => {
+    try {
+        const data = await Messages.create(req.body)
+        if(data){
+            io.emit('message', req.body);
+            res.status(201).send(data)
+        }else{
+            res.status(400).send('failed')
+        }
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
+
+
 // api routes
 app.get("/", (req, res) => res.status(200).send("whatsapp-mern backend service"))
 
@@ -118,8 +144,14 @@ app.post("/messages/new", async (req, res) => {
 
 app.use('/api/v1/', route)
 
+io.on('connection', () => {
+    console.log('a client connected')
+})
 
 // listen
-app.listen(port, () => {
+// app.listen(port, () => {
+//     console.log(`Listening on localhost:${port}`)
+// })
+server.listen(port, () => {
     console.log(`Listening on localhost:${port}`)
 })

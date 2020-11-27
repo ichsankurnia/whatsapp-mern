@@ -4,6 +4,7 @@ import axios from "./axios"
 import './App.css';
 import Sidebar from './Sidebar';
 import Chat from './Chat';
+import socket from './socket'
 
 function App() {
 	const [messages, setMessages] = useState([])
