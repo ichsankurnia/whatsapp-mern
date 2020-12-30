@@ -30,12 +30,12 @@ Router.post('/user/sign-in', login)
 Router.get('/user', getAllUser)
 Router.get('/user/:id', getOneUser)
 Router.post('/user', createNewUser)
-Router.put('/user/:id', updateUser)
+Router.patch('/user/:id', updateUser)
 Router.delete('/user/:id', deleteUser)
 Router.delete('/truncate-user', truncateUser)
 
 // Profile
-Router.put('/user/profile/:user_id', updateProfile)
+Router.patch('/user/profile/:user_id', updateProfile)
 
 
 // Contact
