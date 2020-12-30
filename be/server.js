@@ -78,13 +78,17 @@ db.once("open", () => {
         console.log(change)
 
         if(change.operationType === "insert"){
-            const { message, name, timestamp, received } = change.fullDocument
-            pusher.trigger("messages", "inserted", {
-                message: message,
-                name: name,
-                timestamp: timestamp,
-                received: received
+            const { _id, message, name, timestamp, received } = change.fullDocument
+            io.emit('sent', {
+                messageId: _id,
+                sent: true
             })
+            // pusher.trigger("messages", "inserted", {
+            //     message: message,
+            //     name: name,
+            //     timestamp: timestamp,
+            //     received: received
+            // })
         }else{
             console.log("operation type not inserted")
         }
@@ -99,7 +103,6 @@ app.post('/test', async (req, res) => {
     try {
         const data = await Messages.create(req.body)
         if(data){
-            io.emit('message', req.body);
             res.status(201).send(data)
         }else{
             res.status(400).send('failed')
@@ -144,8 +147,16 @@ app.post("/messages/new", async (req, res) => {
 
 app.use('/api/v1/', route)
 
-io.on('connection', () => {
+io.on('connection', (socket) => {
     console.log('a client connected')
+    socket.on('disconnect', () => {
+        console.log('a client disconnected')
+    })
+
+    socket.on('message', (msg) => {
+        console.log('message :', msg)
+        socket.emit('message', msg)
+    })
 })
 
 // listen
