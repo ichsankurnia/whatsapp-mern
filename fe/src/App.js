@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Pusher from "pusher-js";
+// import Pusher from "pusher-js";
 import axios from "./axios"
 import './App.css';
 import Sidebar from './Sidebar';
@@ -15,25 +15,32 @@ function App() {
 		})
 	}, [])
 
-	useEffect(() => {
-		const pusher = new Pusher('4495e494430a0c853b2a', {
-			cluster: 'ap1'
-		});
+	// useEffect(() => {
+	// 	const pusher = new Pusher('4495e494430a0c853b2a', {
+	// 		cluster: 'ap1'
+	// 	});
 
-		const channel = pusher.subscribe('messages');
-			channel.bind('inserted', (data) => {
-			// alert(JSON.stringify(data));
-			setMessages([...messages, data])
-		});
+	// 	const channel = pusher.subscribe('messages');
+	// 		channel.bind('inserted', (data) => {
+	// 		// alert(JSON.stringify(data));
+	// 		setMessages([...messages, data])
+	// 	});
 		
-		return () => {
-			channel.unbind_all()
-			channel.unsubscribe()
-		}
+	// 	return () => {
+	// 		channel.unbind_all()
+	// 		channel.unsubscribe()
+	// 	}
     
-	}, [messages])                                  // cantumkan state yg terupdate dalam function useEffect ini
+	// }, [messages])                                  // cantumkan state yg terupdate dalam function useEffect ini
 
-	console.log(messages)
+	useEffect(() => {
+		var objDiv = document.getElementById("chat__body");
+		objDiv.scrollTop = objDiv.scrollHeight;
+		
+		socket.on('message', (msg) => {
+			setMessages([...messages, msg])
+		})
+	}, [messages])
 
 	return (
 		<div className="app">
