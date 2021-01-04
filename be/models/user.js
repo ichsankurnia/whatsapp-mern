@@ -30,6 +30,10 @@ const userSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_conversations"
     }],
+    messages: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "c_messages"
+    }],
     created_at: {
         type: String,
         default: moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A") 
