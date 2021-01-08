@@ -18,7 +18,7 @@ const userSchema = mongoose.Schema({
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
         default: "",
     },
-    profile: {
+    profile_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_profiles"
     },

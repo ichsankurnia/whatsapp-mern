@@ -18,7 +18,7 @@ const registerUser = async (req, res) => {
         if(data){
             const profile = await Profile.create({user_id: data._id})
             if(profile){
-                const updateUser = await User.findByIdAndUpdate(data._id, { profile : profile._id })
+                const updateUser = await User.findByIdAndUpdate(data._id, { profile_id : profile._id })
                 if(updateUser){
                     return res.status(201).json({code: 0, message: "succes register new user", data: updateUser})
                 }else{
@@ -50,7 +50,7 @@ const createNewUser = async (req, res) => {
         if(data){
             const profile = await Profile.create({user_id: data._id})
             if(profile){
-                const updateUser = await User.findByIdAndUpdate(data._id, { profile : profile._id })
+                const updateUser = await User.findByIdAndUpdate(data._id, { profile_id : profile._id })
                 if(updateUser){
                     return res.status(201).json({code: 0, message: "success register new user", data: updateUser})
                 }else{
@@ -88,7 +88,7 @@ const getOneUser = async (req, res) => {
         const { id } = req.params
         const data = await User.findById(id).select(['_id', 'username', 'password', 'email']).populate([
             {
-                path: "profile",
+                path: "profile_id",
                 select: ['fullname', 'phone_number', 'photo', 'about'],
                 model: "c_profiles"
             },
@@ -179,23 +179,40 @@ const truncateUser = async (req, res) => {
 }
 
 
-const updateProfile = async (req, res) => {
+const getProfile = async (req, res) => {
     try {
-        const { user_id } = req.params
-        
-        req.body.updated_at = moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A")
+        const { profile_id } = req.params
 
-        const data = await Profile.findOneAndUpdate({ user_id: user_id }, req.body)
-        
+        const data = await Profile.findById(profile_id)
+
         if(data){
-            const updateData = await Profile.findOne({ user_id: user_id })
-
-            return res.status(200).json({code: 0, message: "success update user profile", data: updateData})
+            return res.status(200).json({code: 0, message: `success get profile id ${profile_id}`, data: data})
         }else{
-            return res.status(400).json({code: 1, message: `fail update user profile, user with id '${id}' doesn't exist`, data: null})
+            return res.status(500).json({code: 1, message: `profile id ${profile_id} not found ☹️`, data: null})
         }
     } catch (error) {
         return res.status(400).json({code: 1, message: error.message, data: null})
+    }
+}
+
+const updateProfile = async (req, res) => {
+    try {
+        const { profile_id } = req.params
+        
+        req.body.updated_at = moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A")
+
+        const data = await Profile.findOneAndUpdate({ _id: profile_id }, req.body)
+        
+        if(data){
+            const updateData = await Profile.findOne({ _id: profile_id })
+
+            return res.status(200).json({code: 0, message: "success update user profile", data: updateData})
+        }else{
+            return res.status(400).json({code: 1, message: `fail update user profile, user with id '${profile_id}' doesn't exist ☹️`, data: null})
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({code: 1, message: error.message, data: null})
     }
 }
 
@@ -208,5 +225,6 @@ export {
     updateUser, 
     deleteUser,
     truncateUser,
+    getProfile,
     updateProfile 
 }
