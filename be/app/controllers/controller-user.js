@@ -52,7 +52,7 @@ const createNewUser = async (req, res) => {
             if(profile){
                 const updateUser = await User.findByIdAndUpdate(data._id, { profile : profile._id })
                 if(updateUser){
-                    return res.status(201).json({code: 0, message: "succes register new user", data: updateUser})
+                    return res.status(201).json({code: 0, message: "success register new user", data: updateUser})
                 }else{
                     return res.status(500).json({code: 1, message: "fail register new user", data: null})
                 }
