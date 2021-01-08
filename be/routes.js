@@ -7,7 +7,8 @@ import {
     updateUser,
     deleteUser,
     truncateUser ,
-    updateProfile
+    updateProfile,
+    getProfile
 } from "./app/controllers/controller-user.js";
 import login from "./app/middlewares/authenticate.js"
 import isAuthenticate from "./app/middlewares/verify-token.js"
@@ -16,6 +17,13 @@ import {
     getContactbyUserId, 
     deleteContact 
 } from "./app/controllers/controller-contact.js";
+import { 
+    deleteMessage, 
+    getAllMessage, 
+    getMsgBySenderAndReceiver, 
+    getMsgBySenderOrReceiver, 
+    newMessage 
+} from "./app/controllers/controller-message.js";
 
 
 const Router = express.Router();
@@ -35,7 +43,8 @@ Router.delete('/user/:id', deleteUser)
 Router.delete('/truncate-user', truncateUser)
 
 // Profile
-Router.patch('/user/profile/:user_id', updateProfile)
+Router.get('/user/profile/:profile_id', getProfile)
+Router.patch('/user/profile/:profile_id', updateProfile)
 
 
 // Contact
@@ -43,6 +52,13 @@ Router.get('/contact/:user_id', getContactbyUserId)
 Router.post('/contact', addContact)
 Router.delete('/contact', deleteContact)
 
+
+// Message
+Router.post('/message/new', newMessage)
+Router.get('/message/sync-all', getAllMessage)
+Router.post('/message/sender-and-receiver', getMsgBySenderAndReceiver)
+Router.post('/message/sender-or-receiver', getMsgBySenderOrReceiver)
+Router.delete('/message/delete/:id', deleteMessage)
 
 
 export default Router
