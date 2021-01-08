@@ -1,5 +1,5 @@
-import Message from "../../models/message";
-import User from "../../models/user";
+import Message from "../../models/message.js";
+import User from "../../models/user.js";
 
 
 const newMessage = async (req, res) => {
