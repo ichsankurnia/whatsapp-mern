@@ -13,6 +13,11 @@ const globalReducer = (state = initialState.global, action) => {
                 ...state,
                 chatOn: false || action.payload
             }
+        case ActionType.CONTACT_ONOFF:
+            return {
+                ...state,
+                contactOn: action.status
+            }
         default:
             return state
     }
