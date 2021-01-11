@@ -1,0 +1,47 @@
+.contact {
+    display: flex;
+    flex-direction: column;
+    flex: 0.35;
+    border-right: 1px solid lightgray;
+}
+
+.contact__header {
+    display: flex;
+    padding: 70px 0 10px 10px;
+    min-width: 10vw;
+    /* min-height: 5vw; */
+}
+
+.contact__header > .MuiSvgIcon-root {
+    color: gray;
+    padding: 10px;
+    font-size: 24px !Important;
+}
+
+.contact__header > p {
+    color: #232323;
+    font-weight: 700;
+    font-size: 20px;
+    padding: 8px;
+    margin-left: 5px;
+}
+
+.contact__searchNew {
+    display: flex;
+}
+
+.contact__searchNew > input{
+    outline: 0;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid white;
+    margin-left: 30px;
+    width: 75%;
+    padding-bottom: 0;
+    /* min-width: 20vw; */
+}
+
+.contact__searchNew > .MuiSvgIcon-root {
+    color: gray;
+    padding: 10px;
+}
