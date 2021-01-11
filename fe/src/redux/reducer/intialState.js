@@ -1,6 +1,7 @@
 const initialState = {
     global: {
-        chatOn: false
+        chatOn: false,
+        contactOn: false
     }
 }
 
