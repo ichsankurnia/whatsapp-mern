@@ -11,10 +11,6 @@ const profileSchema = mongoose.Schema({
         type: String,
         default: ""
     },
-    phone_number: {
-        type: String,
-        default: ""
-    },
     photo: {
         type: String,
         default: ""

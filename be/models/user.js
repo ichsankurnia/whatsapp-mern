@@ -3,6 +3,11 @@ import moment from 'moment';
 
 
 const userSchema = mongoose.Schema({
+    phone_number: {
+        type: String,
+        unique: true,
+        required: [true, 'phone number is required']
+    },
     username: {
         type: String,
         unique: true,
