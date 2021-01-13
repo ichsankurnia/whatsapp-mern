@@ -3,13 +3,15 @@ import Profile from "../../models/profile.js"
 import Contact from "../../models/contact.js";
 import moment from 'moment';   
 import { encryptAes } from "../helper/encrypt.js";
+import { idPhoneNumber } from "../helper/helper.js";
 
 
 const registerUser = async (req, res) => {
     try {
-        const { username, password, email } = req.body
+        const { username, password, email, phone_number } = req.body
         
         const data = await User.create({
+            phone_number: idPhoneNumber(phone_number),
             username: username,
             password: await encryptAes(password),
             email: email
@@ -52,15 +54,15 @@ const createNewUser = async (req, res) => {
             if(profile){
                 const updateUser = await User.findByIdAndUpdate(data._id, { profile_id : profile._id })
                 if(updateUser){
-                    return res.status(201).json({code: 0, message: "success register new user", data: updateUser})
+                    return res.status(201).json({code: 0, message: "success register", data: updateUser})
                 }else{
-                    return res.status(500).json({code: 1, message: "fail register new user", data: null})
+                    return res.status(500).json({code: 1, message: "failed register", data: null})
                 }
             }else{
-                return res.status(500).json({code: 1, message: "fail register new user", data: null})
+                return res.status(500).json({code: 1, message: "failed register new user", data: null})
             }
         }else{
-            return res.status(500).json({code: 1, message: "fail register new user", data: null})
+            return res.status(500).json({code: 1, message: "failed register new user", data: null})
         }
     } catch (error) {
         return res.status(400).json({code: 1, message: error.message, data: null})
@@ -86,10 +88,10 @@ const getAllUser = async (req, res) => {
 const getOneUser = async (req, res) => {
     try {
         const { id } = req.params
-        const data = await User.findById(id).select(['_id', 'username', 'password', 'email']).populate([
+        const data = await User.findById(id).select(['_id', 'username', 'password', 'email', 'phone_number']).populate([
             {
                 path: "profile_id",
-                select: ['fullname', 'phone_number', 'photo', 'about'],
+                select: ['fullname', 'photo', 'about'],
                 model: "c_profiles"
             },
             {
@@ -98,11 +100,11 @@ const getOneUser = async (req, res) => {
                 model: "c_contacts",
                 populate: {
                     path: 'contact',
-                    select: ['username', 'email'],
+                    select: ['username', 'email', 'phone_number'],
                     model: 'c_users',
                     populate: {
-                        path: 'profile',
-                        select: ['fullname', 'phone_number'],
+                        path: 'profile_id',
+                        select: ['fullname'],
                         model: 'c_profiles'
                     }
                 }
@@ -126,6 +128,10 @@ const updateUser = async (req, res) => {
         
         if(req.body.password){
             req.body.password = await encryptAes(req.body.password)
+        }
+
+        if(req.body.phone_number){
+            req.body.phone_number = idPhoneNumber(req.body.phone_number)
         }
         
         req.body.updated_at = moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A")
