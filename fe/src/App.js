@@ -5,8 +5,12 @@ import './App.css';
 import Sidebar from './Sidebar';
 import Chat from './Chat';
 import socket from './socket'
+import { connect } from 'react-redux';
+import { setChatOn } from './redux/action/actions';
+import { bindActionCreators } from 'redux';
+import Contact from './Contact';
 
-function App() {
+function App({globalState, setChatOn}) {
 	const [messages, setMessages] = useState([])
 
 	useEffect(() => {
@@ -33,23 +37,45 @@ function App() {
     
 	// }, [messages])                                  // cantumkan state yg terupdate dalam function useEffect ini
 
-	useEffect(() => {
-		var objDiv = document.getElementById("chat__body");
-		objDiv.scrollTop = objDiv.scrollHeight;
-		
+	useEffect(() => {		
 		socket.on('message', (msg) => {
 			setMessages([...messages, msg])
 		})
 	}, [messages])
 
+
+	useEffect(() => {
+		var objDiv = document.getElementById("chat__body");
+		if(objDiv){
+			objDiv.scrollTop = objDiv.scrollHeight;
+		}
+	}, [messages, globalState.chatOn])
+
+
 	return (
 		<div className="app">
 			<div className="app__body">
+				{globalState.contactOn? 
+				<Contact />
+				:
 				<Sidebar />
+				}
 				<Chat messages={messages} />
 			</div>
 		</div>
 	);
 }
 
-export default App;
+
+const mapStateToProps = (state) => {
+    return {
+        globalState: state.global
+    }
+}
+
+
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({setChatOn}, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)
