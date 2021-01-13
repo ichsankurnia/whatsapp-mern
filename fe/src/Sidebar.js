@@ -54,14 +54,9 @@ function Sidebar({setContactOnOff}){
                     <IconButton onClick={() => setOption(!option)} ref={anchorRef}>
                         <MoreVertIcon />
                     </IconButton>
-                    <Popper open={option} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
-                    {({ TransitionProps, placement }) => (
-                        <Grow
-                        {...TransitionProps}
-                        style={{
-                            transformOrigin: placement === 'bottom' ? 'center top' : 'left bottom',
-                        }}
-                        >
+                    <Popper open={option} anchorEl={anchorRef.current} placement='bottom-end' transition>
+                    {({ TransitionProps }) => (
+                        <Grow {...TransitionProps} >
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
                             <MenuList id="split-button-menu">
