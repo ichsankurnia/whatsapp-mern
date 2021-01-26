@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react'
+// import PhoneInput from 'react-phone-number-input'
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import App from './App'
 import axios from './axios'
 import './Login.css'
@@ -6,6 +9,7 @@ import './Login.css'
 function Login(){
     const [app, setApp] = useState(false)
     const [register, setRegister] = useState(false)
+    const [phone, setPhone] = useState('')
     const [email, setEmail] = useState('')
     const [usn, setUsn] = useState('')
     const [pwd, setPwd] = useState('')
@@ -28,6 +32,7 @@ function Login(){
         e.preventDefault()
         if(register){
             const payload = {
+                phone_number: phone,
                 username: usn,
                 password: pwd,
                 email: email
@@ -59,13 +64,17 @@ function Login(){
             }
         }
     }
+
+    const handleOnChange = (e) => {
+        if(e !== undefined) setPhone(e)
+    }
     
     return (
         <>
         {app? 
             <App />
             :
-            <div id="card">
+            <div className={`card ${register && 'register'}`}>
                 <div id="card-content">
                     <div id="card-title">
                         <h2>{register? "SIGN UP" : "SIGN IN"}</h2>
@@ -74,6 +83,17 @@ function Login(){
                     <form className="form">
                         {register &&
                         <>
+                            <label style={{marginTop: 22}}>
+                                &nbsp;Phone Number
+                            </label>
+                            <PhoneInput
+                                type="text"
+                                country={"ps"} enableAreaCodes={true}
+                                value={phone} onChange={handleOnChange}
+                                inputStyle={{ backgroundColor: 'transparent', border: 'none', outline: 0 }}
+                                required
+                            />
+                            <div className="form-border"></div>
                             <label htmlFor="user-email" style={{marginTop: 22}}>
                                 &nbsp;Email
                             </label>
@@ -91,7 +111,7 @@ function Login(){
                         {!register && 
                         <>
                             <label htmlFor="user-email" style={{marginTop: 22}}>
-                                &nbsp;Username / Email
+                                &nbsp;Username / Email / PhoneNumber
                             </label>
                             <input id="user-email" className="form-content" type="text" name="email" onChange={(e) => setUsn(e.target.value)} value={usn} autoComplete='true' required />
                             <div className="form-border"></div>
