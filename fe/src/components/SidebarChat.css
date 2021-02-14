@@ -5,6 +5,14 @@
     border-bottom: 1px solid white;
 }
 
+.sidebarChat-active {
+    display: flex;
+    padding: 20px;
+    cursor: pointer;
+    border-bottom: 1px solid white;
+    background-color: #fff;
+}
+
 .sidebarChat:hover {
     background-color: white;
 }

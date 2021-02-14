@@ -16,10 +16,10 @@ import MenuList from '@material-ui/core/MenuList';
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setContactOnOff } from "./../redux/action/actions";
+import { setChatOn, setContactOnOff } from "./../redux/action/actions";
 
 
-function Sidebar({setContactOnOff}){
+function Sidebar({setContactOnOff, setChatOn}){
     const [option, setOption] = React.useState(false)
 
     const anchorRef = React.useRef(null);
@@ -38,6 +38,9 @@ function Sidebar({setContactOnOff}){
         window.location.reload()
     }
 
+    const handleClickRoomChat = () => {
+        setChatOn()
+    }
 
     return (
         <div className="sidebar">
@@ -80,7 +83,7 @@ function Sidebar({setContactOnOff}){
             </div>
 
             <div className="sidebar__chats">
-                <SidebarChat />
+                <SidebarChat selected onClick={handleClickRoomChat} />
                 <SidebarChat />
                 <SidebarChat />
             </div>
@@ -89,7 +92,7 @@ function Sidebar({setContactOnOff}){
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactOnOff}, dispatch)
+    return bindActionCreators({setChatOn, setContactOnOff}, dispatch)
 }
 
 export default connect(null, mapDispatchToProps)(Sidebar)
