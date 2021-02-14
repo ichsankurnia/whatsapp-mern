@@ -30,9 +30,7 @@ function Chat({ messages, globalState }){                                       
 
         if(text !== ''){
             socket.emit('message', payload)
-            const res = await axios.post('messages/new', payload)
-
-            console.log(res)
+            await axios.post('messages/new', payload)
         }
 
         setText('')

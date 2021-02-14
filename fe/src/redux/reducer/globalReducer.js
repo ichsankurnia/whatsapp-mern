@@ -3,6 +3,7 @@ import { ActionType } from '../action/actions'
 
 const globalReducer = (state = initialState.global, action) => {
     switch (action.type){
+        // Menampilkan isi chat saat mengclick room chat
         case ActionType.CHAT_ON:
             return {
                 ...state,
@@ -13,6 +14,7 @@ const globalReducer = (state = initialState.global, action) => {
                 ...state,
                 chatOn: false || action.payload
             }
+        // Menyembunyikan list chat dan menampilkan list contact
         case ActionType.CONTACT_ONOFF:
             return {
                 ...state,

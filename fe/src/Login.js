@@ -7,7 +7,7 @@ import axios from './axios'
 import './Login.css'
 
 function Login(){
-    const [app, setApp] = useState(false)
+    const [app, setApp] = useState(true)
     const [register, setRegister] = useState(false)
     const [phone, setPhone] = useState('')
     const [email, setEmail] = useState('')
@@ -16,8 +16,8 @@ function Login(){
 
 
     useEffect(() => {
-        if(localStorage.getItem('token')) setApp(true)
-        else setApp(false)
+        if(!localStorage.getItem('token')) setApp(false)
+        else setApp(true)
     }, [])
 
 
@@ -48,7 +48,7 @@ function Login(){
             })
         }else{
             const payload = {
-                username: usn,
+                user_mail_phone: usn,
                 password: pwd
             }
 
