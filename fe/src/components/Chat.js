@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import moment from 'moment-timezone';   
 import "./Chat.css"
 
@@ -18,6 +18,15 @@ moment.tz.setDefault("Asia/Jakarta");
 
 function Chat({ messages, globalState }){                                        // props.messages
     const [text, setText] = useState('')
+
+
+    useEffect(() => {
+		var objDiv = document.getElementById("chat__body");
+		if(objDiv){
+			objDiv.scrollTop = objDiv.scrollHeight;
+		}
+	}, [messages, globalState.chatOn])
+
 
     const sendMessage = async (e) => {
         e.preventDefault()
