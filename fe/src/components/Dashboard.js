@@ -10,10 +10,9 @@ import Chat from './Chat';
 import Contact from './Contact';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import { setChatOn } from './../redux/action/actions';
 
-function Dashboard({globalState, setChatOn}) {
+
+function Dashboard({globalState}) {
 	const [messages, setMessages] = useState([])
 
 	useEffect(() => {
@@ -23,6 +22,7 @@ function Dashboard({globalState, setChatOn}) {
 
 		socket.emit('user-loggedin', localStorage.getItem('whatsapp-mern-user'))
 	}, [])
+
 
 	// useEffect(() => {
 	// 	const pusher = new Pusher('4495e494430a0c853b2a', {
@@ -41,20 +41,11 @@ function Dashboard({globalState, setChatOn}) {
 	// 	}
     
 	// }, [messages])                                  // cantumkan state yg terupdate dalam function useEffect ini
-
 	useEffect(() => {		
 		socket.on('message', (msg) => {
 			setMessages([...messages, msg])
 		})
 	}, [messages])
-
-
-	useEffect(() => {
-		var objDiv = document.getElementById("chat__body");
-		if(objDiv){
-			objDiv.scrollTop = objDiv.scrollHeight;
-		}
-	}, [messages, globalState.chatOn])
 
 
 	return (
@@ -79,8 +70,4 @@ const mapStateToProps = (state) => {
 }
 
 
-const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setChatOn}, dispatch)
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)
+export default connect(mapStateToProps, null)(Dashboard)
