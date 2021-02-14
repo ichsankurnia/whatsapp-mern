@@ -9,6 +9,7 @@ import "moment-timezone"
 
 import Messages from "./dbMessages.js";
 import route from "./routes.js";
+import GlobalVariable from "./app/helper/globalVariable.js";
 
 
 import { createRequire } from 'module';
@@ -26,6 +27,7 @@ var io = require('socket.io')(server, {
     }
 });
 
+let variable = new GlobalVariable()
 
 const { PUSHER_ID, PUSHER_KEY, PUSHER_SECRET } = process.env
 const pusher = new Pusher({
@@ -65,6 +67,14 @@ mongoose.connect(connection_url, mongooOption, (err) => {
     console.log(err)
 })
 
+mongoose.connection.on('open', function (ref) {
+    console.log('Connected to mongo server.');
+});
+mongoose.connection.on('error', function (err) {
+    console.log('Could not connect to mongo server!');
+    console.log(err);
+});
+
 
 const db = mongoose.connection
 
@@ -81,7 +91,8 @@ db.once("open", () => {
             const { _id, message, name, timestamp, received } = change.fullDocument
             io.emit('sent', {
                 messageId: _id,
-                sent: true
+                sent: true,
+                message: "pesan terkirim dan telah masuk ke database"
             })
             // pusher.trigger("messages", "inserted", {
             //     message: message,
@@ -147,16 +158,38 @@ app.post("/messages/new", async (req, res) => {
 
 app.use('/api/v1/', route)
 
+
+var handle=null;
+// var private=null;
+var users={};
+var keys={};
+
+
 io.on('connection', (socket) => {
-    console.log('a client connected')
+    console.log('a client connected, SocketID :', socket.id)
+
     socket.on('disconnect', () => {
-        console.log('a client disconnected')
+        console.log('a client disconnected, SocketID :', socket.id)
+    })
+    
+    socket.on('user-loggedin', (data) => {
+        console.log("User Loggedin the apps :", data, "SocketID :", socket.id)
+        handle = JSON.parse(data)._id
+        variable.handle = JSON.parse(data)._id
+        console.log("Handle :", variable.handle)
+
+        io.to(socket.id).emit('handle', handle);
+        users[handle]=socket.id;
+        keys[socket.id]=handle;
+        console.log("Users list : "+ JSON.stringify(users));
+        console.log("keys list : "+ JSON.stringify(keys));
     })
 
     socket.on('message', (msg) => {
         console.log('message :', msg)
         socket.emit('message', msg)
     })
+
 })
 
 // listen

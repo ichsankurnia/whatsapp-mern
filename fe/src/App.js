@@ -17,6 +17,8 @@ function App({globalState, setChatOn}) {
 		axios.get("/messages/sync").then((res) => {
 			setMessages(res.data)
 		})
+
+		socket.emit('user-loggedin', localStorage.getItem('user'))
 	}, [])
 
 	// useEffect(() => {
