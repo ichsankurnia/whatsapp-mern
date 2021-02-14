@@ -5,7 +5,7 @@ import "react-phone-input-2/lib/style.css";
 import axios from './../axios'
 import './Login.css'
 
-function Login(){
+function Login({setToken}){
     const [register, setRegister] = useState(false)
     const [phone, setPhone] = useState('')
     const [email, setEmail] = useState('')
@@ -49,7 +49,7 @@ function Login(){
                 console.log(res)
                 localStorage.setItem('whatsapp-mern-user', JSON.stringify(res.data.data))
                 localStorage.setItem('whatsapp-mern-token', res.data.token)
-                window.location.reload()
+                setToken(res.data.token)
             } catch (error) {
                 if(error.response) alert(error.response.data.message)
                 else alert(JSON.parse(JSON.stringify(error)).message)
