@@ -6,7 +6,7 @@ import { Avatar, IconButton } from '@material-ui/core'
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { setContactOnOff } from './redux/action/actions'
+import { setContactOnOff } from './../redux/action/actions'
 
 
 function ContactChild(){

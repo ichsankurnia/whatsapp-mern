@@ -1,7 +1,9 @@
 import React from "react"
 import "./SidebarChat.css"
+
 import { Avatar } from "@material-ui/core"
-import { setChatOn } from "./redux/action/actions"
+
+import { setChatOn } from "./../redux/action/actions"
 import { bindActionCreators } from "redux"
 import { connect } from "react-redux"
 

@@ -16,7 +16,7 @@ import MenuList from '@material-ui/core/MenuList';
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setContactOnOff } from "./redux/action/actions";
+import { setContactOnOff } from "./../redux/action/actions";
 
 
 function Sidebar({setContactOnOff}){
