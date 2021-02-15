@@ -7,17 +7,14 @@ const conversationSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_messages"
     }],
-    sender: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "c_users"
-    },
-    receiver: [{
+    recipients: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_users"
     }],
-    conversation: {
+    // as foreignKey relation to User Schema
+    user_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "c_conversations"
+        ref: "c_users"
     },
     created_at: {
         type: String,

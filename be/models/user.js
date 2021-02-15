@@ -23,21 +23,20 @@ const userSchema = mongoose.Schema({
         match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
         default: "",
     },
+    // as foreignKey relation to Profile Schema
     profile_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_profiles"
     },
+    // as foreignKey relation to Contact Schema
     contacts: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_contacts"
     }],
+    // as foreignKey relation to Conversation Schema
     conversations: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_conversations"
-    }],
-    messages: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "c_messages"
     }],
     created_at: {
         type: String,

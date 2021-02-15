@@ -3,6 +3,7 @@ import moment from 'moment';
 
 
 const profileSchema = mongoose.Schema({
+    // as foreignKey relation to User Schema
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_users"

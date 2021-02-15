@@ -3,7 +3,7 @@ import moment from 'moment';
 
 
 const messageSchema = mongoose.Schema({
-    message: {
+    text: {
         type: String,
         default: ""
     },
@@ -11,9 +11,10 @@ const messageSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_users"
     },
-    receiver_id: {
+    // as foreignKey relation to conversation Schema
+    conversation_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "c_users"
+        ref: "c_conversations"
     },
     created_at: {
         type: String,

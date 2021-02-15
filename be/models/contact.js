@@ -3,7 +3,8 @@ import moment from 'moment';
 
 
 const contactSchema = mongoose.Schema({
-    owner: {
+    // as foreignKey relation to User Schema
+    user_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_users"
     },
