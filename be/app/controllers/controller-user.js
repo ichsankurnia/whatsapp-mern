@@ -160,7 +160,7 @@ const deleteUser = async (req, res) => {
 
         if(data){
             await Profile.findOneAndDelete({ user_id: id })
-            await Contact.findOneAndDelete({ owner : id })
+            await Contact.findOneAndDelete({ user_id : id })
 
             return res.status(200).json({code: 0, message: "success delete user", data: data})
         }else{

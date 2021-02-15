@@ -4,22 +4,22 @@ import User from "../../models/user.js";
 
 const addContact = async (req, res) => {
     try {
-        const { owner, contact } = req.body
+        const { user_id, contact } = req.body
         
-        const findOwner = await User.findOne({_id: owner})
+        const findOwner = await User.findOne({_id: user_id})
         const findContact = await User.findOne({_id: contact})
         
-        if(!findOwner) return res.status(400).json({code: 1, message: `owner with user id '${req.body.owner}' not found ☹️`, data: null})
-        if(!findContact) return res.status(400).json({code: 1, message: `contact with user id '${req.body.contact}' not found ☹️`, data: null})
+        if(!findOwner) return res.status(400).json({code: 1, message: `owner with user id '${user_id}' not found ☹️`, data: null})
+        if(!findContact) return res.status(400).json({code: 1, message: `contact with user id '${contact}' not found ☹️`, data: null})
         
-        if(owner === contact) return res.status(400).json({code: 1, message: `you cant't add yourself as a contact lol 😝`, data: null})
+        if(user_id === contact) return res.status(400).json({code: 1, message: `you cant't add yourself as a contact lol 😝`, data: null})
         
         const data = await Contact.create(req.body)
 
         if(data){
             // jika contact berhasil ditambahkan, update collection user pada column/document contact
             await User.findByIdAndUpdate(
-                data.owner,
+                data.user_id,
                 { 
                     $push: { contacts: data._id } 
                 },
@@ -28,9 +28,9 @@ const addContact = async (req, res) => {
                 }
             )
 
-            return res.status(201).json({code: 0, message: `success add contact to user id '${req.body.owner}' 😆`, data: data})
+            return res.status(201).json({code: 0, message: `success add contact to user id '${user_id}' 😆`, data: data})
         }else{
-            return res.status(400).json({code: 1, message: `fail add contact to user id '${req.body.owner}' ☹️`, data: null})
+            return res.status(400).json({code: 1, message: `fail add contact to user id '${user_id}' ☹️`, data: null})
         }
 
     } catch (error) {
@@ -43,9 +43,9 @@ const getContactbyUserId = async (req, res) => {
     try {
         const { user_id } = req.params
 
-        const findContact = await Contact.find({owner: user_id}).populate([
+        const findContact = await Contact.find({user_id: user_id}).populate([
             {
-                path: 'owner',
+                path: 'user_id',
                 select: ['username', 'email'],
                 model: 'c_users',
                 populate: {
@@ -69,7 +69,7 @@ const getContactbyUserId = async (req, res) => {
         if(findContact.length > 0){
             return res.status(201).json({code: 0, message: `success get contact user id '${user_id}' 😆`, data: findContact})
         }else{
-            return res.status(400).json({code: 1, message: `contacts of user id '${user_id}' doesn't exist ☹️`, data: null})
+            return res.status(400).json({code: 1, message: `the contact of user id '${user_id}' doesn't exist ☹️`, data: null})
         }
     } catch (error) {
         return res.status(400).json({code: 1, message: `${error.message} ☹️`, data: null})
@@ -79,21 +79,21 @@ const getContactbyUserId = async (req, res) => {
 
 const deleteContact = async (req, res) => {
     try {
-        const { owner, contact } = req.body
+        const { user_id, contact } = req.body
 
-        const data = await Contact.findOneAndDelete({owner: owner, contact: contact})      
+        const data = await Contact.findOneAndDelete({user_id: user_id, contact: contact})      
 
         if(data){
             await User.updateOne(
-                { _id: owner },
+                { _id: user_id },
                 {
                     $pull : { contacts: data._id }
                 }
             )
 
-            return res.status(201).json({code: 0, message: `success delete contact '${contact}' with owner '${owner}' 😆`, data: data})
+            return res.status(201).json({code: 0, message: `success delete contact '${contact}' with owner '${user_id}' 😆`, data: data})
         }else{
-            return res.status(400).json({code: 1, message: `fail delete contact, contact '${contact}' with owner '${owner}' doesn't exist ☹️`, data: null})
+            return res.status(400).json({code: 1, message: `fail delete contact, contact '${contact}' with owner '${user_id}' doesn't exist ☹️`, data: null})
         }
     } catch (error) {
         return res.status(400).json({code: 1, message: `${error.message} ☹️`, data: null})
