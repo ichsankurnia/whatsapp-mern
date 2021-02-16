@@ -55,7 +55,8 @@ app.use(cors())
 // DB config
 const { DB_NAME, DB_USER, DB_PASS } = process.env
 
-const connection_url = `mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.ynrf1.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`
+// const connection_url = `mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.ynrf1.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`
+const connection_url = `mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.ynrf1.mongodb.net/${DB_NAME}?authSource=admin&compressors=zlib&retryWrites=true&w=majority&ssl=true`
 
 const mongooOption = {
     useCreateIndex: true,
@@ -181,13 +182,27 @@ io.on('connection', (socket) => {
         io.to(socket.id).emit('handle', handle);
         users[handle]=socket.id;
         keys[socket.id]=handle;
-        console.log("Users list : "+ JSON.stringify(users));
-        console.log("keys list : "+ JSON.stringify(keys));
     })
 
     socket.on('message', (msg) => {
         console.log('message :', msg)
         socket.emit('message', msg)
+    })
+
+    const id = socket.handshake.query.id
+    socket.join(id)
+    console.log('a client connected socketID :', socket.id, "userID :", id)
+  
+    socket.on('send-message', ({ recipients, text }) => {
+      recipients.forEach(recipient => {
+        console.log(recipient, text)
+        const newRecipients = recipients.filter(r => r !== recipient)
+        newRecipients.push(id)
+        console.log(newRecipients)
+        socket.broadcast.to(recipient).emit('receive-message', {
+          recipients: newRecipients, sender: id, text
+        })
+      })
     })
 
 })
