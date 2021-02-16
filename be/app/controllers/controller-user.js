@@ -104,7 +104,7 @@ const getOneUser = async (req, res) => {
                     model: 'c_users',
                     populate: {
                         path: 'profile_id',
-                        select: ['fullname'],
+                        select: ['fullname', 'photo', 'about'],
                         model: 'c_profiles'
                     }
                 }

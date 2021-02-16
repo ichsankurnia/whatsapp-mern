@@ -41,10 +41,32 @@ const login = async (req, res) => {
                 payload[data[1]] = user_mail_phone
             }
 
-            const dataByPass = await User.findOne(payload)
+            const dataByPass = await User.findOne(payload).select(['_id', 'username', 'password', 'email', 'phone_number']).populate([
+                {
+                    path: "profile_id",
+                    select: ['fullname', 'photo', 'about'],
+                    model: "c_profiles"
+                },
+                {
+                    path: "contacts",
+                    select: ['contact'],
+                    model: "c_contacts",
+                    populate: {
+                        path: 'contact',
+                        select: ['username', 'email', 'phone_number'],
+                        model: 'c_users',
+                        populate: {
+                            path: 'profile_id',
+                            select: ['fullname'],
+                            model: 'c_profiles'
+                        }
+                    }
+                }
+            ])
 
             if(dataByPass){
                 const token = jwt.sign({ 
+                    _id: dataByPass._id,
                     phone_number: dataByPass.phone_number,
                     username: dataByPass.username,
                     password: dataByPass.password,
