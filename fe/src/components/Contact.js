@@ -4,25 +4,30 @@ import './Contact.css'
 import { AddCircle, ArrowBack, PersonAdd, SearchOutlined } from '@material-ui/icons'
 import { Avatar, IconButton } from '@material-ui/core'
 
+import axios from "./../axios"
+
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { setContactOnOff } from './../redux/action/actions'
+import { setContactOnOff, setContactList } from './../redux/action/actions'
 
 
-function ContactChild(){
+function ContactChild(props){
+    const { contact } = props
+
     return (
         <div className="sidebarChat">
             <Avatar />
-            <div className="sidebarChat__info">
-                <h2>Contact Name</h2>
-                <p>busy...</p>
+            <div className="sidebarChat__info" onClick={() => props.onClickContactChat(contact)}>
+                <h2>{contact?.username}</h2>
+                <p>{contact?.profile_id?.about}</p>
             </div>
         </div>
     )
 }
 
-function Contact({setContactOnOff}){
+function Contact({id, userState, setContactOnOff, setContactList}){
     const [NC, setNC] = React.useState(false)
+    const [newContact, setNewContact] = React.useState('')
 
     const handleArrowBackClick = (e) => {
         e.preventDefault()
@@ -31,7 +36,32 @@ function Contact({setContactOnOff}){
         else setContactOnOff(false)
     }
 
-    console.log(NC)
+
+    const handleAddNewContact = async (e) => {
+        e.preventDefault()
+
+        try {
+            const payload = {
+                "user_id": id,
+                "new_contact": newContact
+            }
+
+            const res = await axios.post(`api/v1/contact`, payload)
+            
+            console.log("Add new contact :", res.data.data)
+            
+            setContactList(res.data.data.contacts)
+            setNC(!NC)
+        } catch (error) {
+            if(error.response) alert(error.response.data.message)
+            else alert(JSON.parse(JSON.stringify(error)).message)
+        }
+    }
+
+    const handleClickContactToChat = (user) => {
+        console.log(user)
+    }
+
     return (
         <div className="contact">
             <div className="contact__header">
@@ -44,9 +74,9 @@ function Contact({setContactOnOff}){
             {NC?
             <div className="contact__searchNew">
                 {/* <div className="sidebar__searchContainer"> */}
-                    <input type="text" placeholder="Type phone number to add" />
+                    <input type="text" value={newContact} onChange={(e) => setNewContact(e.target.value)} placeholder="Type phone number to add" style={{fontSize: 25}} />
                 {/* </div> */}
-                <IconButton>
+                <IconButton onClick={handleAddNewContact}>
                     <AddCircle />
                 </IconButton>
             </div>
@@ -68,7 +98,13 @@ function Contact({setContactOnOff}){
                             <h2>New contact</h2>
                         </div>
                     </div>
-                    <ContactChild />
+                    {userState.contact_list && userState.contact_list.map((contact, key) => (
+                        <ContactChild 
+                            key={key} 
+                            contact={contact.contact} 
+                            onClickContactChat={handleClickContactToChat} 
+                        />
+                    ))}
                     <ContactChild />
                     <ContactChild />
                 </div>
@@ -78,9 +114,16 @@ function Contact({setContactOnOff}){
     )
 }
 
+
+const mapStateToProps = (state) => {
+    return {
+        userState: state.user
+    }
+}
+
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactOnOff}, dispatch)
+    return bindActionCreators({setContactOnOff, setContactList}, dispatch)
 }
 
 
-export default connect(null, mapDispatchToProps)(Contact)
+export default connect(mapStateToProps, mapDispatchToProps)(Contact)
