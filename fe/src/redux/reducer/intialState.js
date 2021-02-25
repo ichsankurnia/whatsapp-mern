@@ -6,13 +6,19 @@ const initialState = {
     user: {
         user_id: "",
         phone_number: "",
+        room_chat: {
+
+        },
         contact_list: [
     
         ],
         conversation_list: [
     
         ],
-    }
+    },
+    conversations: [
+        
+    ]
 }
 
 export default initialState
