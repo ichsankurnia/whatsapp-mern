@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 // import PhoneInput from 'react-phone-number-input'
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { CircularProgress } from '@material-ui/core';
+
 import axios from './../axios'
 import './Login.css'
 
 function Login({submitToken, submitUser}){
     const [register, setRegister] = useState(false)
+    const [showLoader, setShowLoader] = useState(false)
     const [phone, setPhone] = useState('')
     const [email, setEmail] = useState('')
     const [usn, setUsn] = useState('')
@@ -22,6 +25,7 @@ function Login({submitToken, submitUser}){
 
     const handleSubmitForm = async (e) => {
         e.preventDefault()
+        setShowLoader(true)
         if(register){
             const payload = {
                 phone_number: phone,
@@ -37,6 +41,7 @@ function Login({submitToken, submitUser}){
             }).catch((err) => {
                 if(err.response) alert(err.response.data.message)
                 else alert(JSON.parse(JSON.stringify(err)).message)
+                setShowLoader(false)
             })
         }else{
             const payload = {
@@ -52,6 +57,7 @@ function Login({submitToken, submitUser}){
             } catch (error) {
                 if(error.response) alert(error.response.data.message)
                 else alert(JSON.parse(JSON.stringify(error)).message)
+                setShowLoader(false)
             }
         }
     }
@@ -61,6 +67,7 @@ function Login({submitToken, submitUser}){
     }
     
     return (
+        <div>
         <div className={`card ${register && 'register'}`}>
             <div id="card-content">
                 <div id="card-title">
@@ -116,7 +123,9 @@ function Login({submitToken, submitUser}){
                 </form>
             </div>
         </div>
-    )
+        {showLoader && <CircularProgress style={{color: '#4caf50', display: 'table', margin: 'auto', marginTop: -50}} />}
+        </div>
+        )
 }
 
 export default Login
