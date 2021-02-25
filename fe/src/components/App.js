@@ -15,13 +15,16 @@ function App() {
 	console.log(user?.email)
 
 	useEffect(() => {
-		if(token){
+		if(token && token !== "undefined" && token !== undefined ){
+		// if(token){
 			const decoded = jwt_decode(token)
 			const currentTime = Date.now() / 1000;
 
 			if(decoded.exp < currentTime){
 				localStorage.clear()
 			}
+		}else{
+			localStorage.clear()
 		}
 	}, [token])
 
