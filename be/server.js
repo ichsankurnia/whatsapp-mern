@@ -56,7 +56,8 @@ app.use(cors())
 const { DB_NAME, DB_USER, DB_PASS } = process.env
 
 // const connection_url = `mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.ynrf1.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`
-const connection_url = `mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.ynrf1.mongodb.net/${DB_NAME}?authSource=admin&compressors=zlib&retryWrites=true&w=majority&ssl=true`
+// const connection_url = `mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.ynrf1.mongodb.net/${DB_NAME}?authSource=admin&compressors=zlib&retryWrites=true&w=majority&ssl=true`
+const connection_url = `mongodb://${DB_USER}:${DB_PASS}@cluster0-shard-00-00.ynrf1.mongodb.net:27017,cluster0-shard-00-01.ynrf1.mongodb.net:27017,cluster0-shard-00-02.ynrf1.mongodb.net:27017/${DB_NAME}?ssl=true&replicaSet=atlas-12isqv-shard-0&authSource=admin&retryWrites=true&w=majority`
 
 const mongooOption = {
     useCreateIndex: true,
@@ -175,13 +176,13 @@ io.on('connection', (socket) => {
     
     socket.on('user-loggedin', (data) => {
         console.log("User Loggedin the apps :", data, "SocketID :", socket.id)
-        handle = JSON.parse(data)._id
-        variable.handle = JSON.parse(data)._id
-        console.log("Handle :", variable.handle)
+        // handle = JSON.parse(data)._id
+        // variable.handle = JSON.parse(data)._id
+        // console.log("Handle :", variable.handle)
 
-        io.to(socket.id).emit('handle', handle);
-        users[handle]=socket.id;
-        keys[socket.id]=handle;
+        // io.to(socket.id).emit('handle', handle);
+        // users[handle]=socket.id;
+        // keys[socket.id]=handle;
     })
 
     socket.on('message', (msg) => {
@@ -193,16 +194,34 @@ io.on('connection', (socket) => {
     socket.join(id)
     console.log('a client connected socketID :', socket.id, "userID :", id)
   
-    socket.on('send-message', ({ recipients, text }) => {
-      recipients.forEach(recipient => {
-        console.log(recipient, text)
-        const newRecipients = recipients.filter(r => r !== recipient)
-        newRecipients.push(id)
-        console.log(newRecipients)
-        socket.broadcast.to(recipient).emit('receive-message', {
-          recipients: newRecipients, sender: id, text
+    // socket.on('send-message', ({ recipients, text, timestamp }) => {
+    //   recipients.forEach(recipient => {
+    //     console.log(recipient, text)
+    //     const newRecipients = recipients.filter(r => r !== recipient)
+    //     newRecipients.push(id)
+    //     console.log(newRecipients)
+    //     socket.broadcast.to(recipient).emit('receive-message', {
+    //       recipients: newRecipients, sender: id, text, timestamp
+    //     })
+    //   })
+    // })
+
+    socket.on('send-message', ({ conversation_id, recipients, group, message }) => {
+        const { text, timestamp } = message
+        recipients.forEach(recipient => {
+            console.log(recipient, text)
+            const newRecipients = recipients.filter(r => r !== recipient)
+            newRecipients.push(id)
+            console.log(newRecipients)
+            socket.broadcast.to(recipient).emit('receive-message', {
+                conversation_id,
+                group,
+                recipients: newRecipients,
+                message : {
+                    sender: id, text, timestamp
+                }
+            })
         })
-      })
     })
 
 })
