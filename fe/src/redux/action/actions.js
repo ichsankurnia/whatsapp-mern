@@ -6,6 +6,8 @@ export const ActionType = {
     SET_PHONE_NUMBER: "SET_PHONE_NUMBER",
     SET_CONTACT_LIST: "SET_CONTACT_LIST",
     SET_CONVERSATION_LIST: "SET_CONVERSATION_LIST",
+    SET_ROOM_CHAT: "SET_ROOM_CHAT",
+    SET_ROOM_CHAT_ID: ""
 }
 
 export const setChatOn = (payload) => {
@@ -42,3 +44,17 @@ export const setConversationList = (listConversation) => {
         data: listConversation
     }
 } 
+
+export const setRoomChatData = (data) => {
+    return {
+        type: ActionType.SET_ROOM_CHAT,
+        data: data
+    }
+}
+
+export const setRoomChatID = (conversationId) => {
+    return {
+        type: ActionType.SET_ROOM_CHAT_ID,
+        id: conversationId
+    }
+}

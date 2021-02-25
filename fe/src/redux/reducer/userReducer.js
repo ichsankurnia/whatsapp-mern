@@ -2,7 +2,7 @@ import initialState from './intialState'
 import { ActionType } from '../action/actions'
 
 const userReducer = (state = initialState.user, action) => {
-    console.log(action)
+    // console.log(action)
     switch (action.type){
         case ActionType.SET_CONTACT_LIST:
             return {
@@ -23,6 +23,18 @@ const userReducer = (state = initialState.user, action) => {
             return {
                 ...state,
                 phone_number: action.phone_number
+            }
+        case ActionType.SET_ROOM_CHAT:
+            return {
+                ...state,
+                room_chat: action.data
+            }
+        case ActionType.SET_ROOM_CHAT_ID:
+            const newRoomChat = { ...state.room_chat }
+            newRoomChat['room_chat_id'] = action.id
+            return {
+                ...state,
+                room_chat: newRoomChat
             }
         default:
             return state
