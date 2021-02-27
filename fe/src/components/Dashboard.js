@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 // import Pusher from "pusher-js";
 import './App.css';
 
@@ -12,20 +12,34 @@ import Contact from './Contact';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { setContactList, setConversationList } from '../redux/action/actions';
+import { addConversation, addMessageToConversation } from '../redux/action/conversationAction';
 
 import { useSocket } from '../contexts/SocketProvider';
+import { CircularProgress } from '@material-ui/core';
 
 
-function Dashboard({id, globalState, setContactList, setConversationList}) {
+function Dashboard({id, globalState, setContactList, setConversationList, conversationState, addConversation, addMessageToConversation}) {
 	const [messages, setMessages] = useState([])
+	const [showLoader, setShowLoader] = useState(true)
 
 	const socket = useSocket()
 
+	
+	const addNewConversation = useCallback((payloadConversation) => {
+		addConversation(1, 3, createConversation(conversationState, payloadConversation))
+
+	}, [conversationState, addConversation])
+
+	const createConversation = (prevConversation, payloadConversation) => {
+        const { conversation_id, group, recipients, message } = payloadConversation
+
+        return [...prevConversation, {conversation_id, group, recipients, messages: [message]}]
+    }
 
 	useEffect(() => {
-		axios.get("/messages/sync").then((res) => {
-			setMessages(res.data)
-		})
+		// axios.get("/messages/sync").then((res) => {
+		// 	setMessages(res.data)
+		// })
 
 		if (socket == null) return
 
@@ -43,11 +57,29 @@ function Dashboard({id, globalState, setContactList, setConversationList}) {
 			console.log(data)
 		})
 
-	}, [socket])
+		// socket.on('receive-message', (data) => {
+			// console.log(data)
+		socket.on('receive-message', (conversation) => {
+			const exist = obj => obj.conversation_id === conversation.conversation_id;
+
+			console.log(conversationState.some(exist))
+
+			if(conversationState.some(exist)){
+				console.log('conversation telah ada, add message to conversation')
+				addMessageToConversation(conversation.conversation_id, conversation.message)
+			}else{
+				addNewConversation(conversation)
+			}
+
+		})
+
+		return () => socket.off('receive-message')
+
+	}, [socket, conversationState, addNewConversation, addMessageToConversation])
+
 
 
 	useEffect( () => {
-
 		async function fetchData(){
 			try {
 				const res = await axios.get(`api/v1/user/${id}`)
@@ -55,9 +87,11 @@ function Dashboard({id, globalState, setContactList, setConversationList}) {
 				
 				setContactList(res.data.data.contacts)
 				setConversationList(res.data.data?.conversation)
+				setShowLoader(false)
 			} catch (error) {
-				if(error.response) alert(error.response.data.message)
-				else alert(JSON.parse(JSON.stringify(error)).message)
+				// if(error.response) alert(error.response.data.message)
+				// else alert(JSON.parse(JSON.stringify(error)).message)
+				fetchData()
 			}
 		}
 
@@ -82,17 +116,18 @@ function Dashboard({id, globalState, setContactList, setConversationList}) {
 	// 	}
     
 	// }, [messages])                                  // cantumkan state yg terupdate dalam function useEffect ini
-	useEffect(() => {
-		if (socket == null) return	
+	// useEffect(() => {
+	// 	if (socket == null) return	
 
-		socket.on('message', (msg) => {
-			setMessages([...messages, msg])
-		})
-	}, [messages, socket])
+	// 	socket.on('message', (msg) => {
+	// 		setMessages([...messages, msg])
+	// 	})
+	// }, [messages, socket])
 
 
 	return (
 		<div className="app">
+			{showLoader && <CircularProgress style={{color: '#4caf50'}} />}
 			<div className="app__body">
 				{globalState.contactOn? 
 				<Contact id={id} />
@@ -108,12 +143,13 @@ function Dashboard({id, globalState, setContactList, setConversationList}) {
 
 const mapStateToProps = (state) => {
     return {
-        globalState: state.global
+        globalState: state.global,
+		conversationState: state.conversation
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactList, setConversationList}, dispatch)
+    return bindActionCreators({setContactList, setConversationList, addConversation, addMessageToConversation}, dispatch)
 }
 
 
