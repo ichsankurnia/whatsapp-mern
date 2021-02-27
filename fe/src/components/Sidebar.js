@@ -16,10 +16,10 @@ import MenuList from '@material-ui/core/MenuList';
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setChatOn, setContactOnOff } from "./../redux/action/actions";
+import { setChatOn, setContactOnOff, setRoomChatData, setRoomChatID } from "./../redux/action/actions";
 
 
-function Sidebar({setContactOnOff, setChatOn}){
+function Sidebar({conversationState, setContactOnOff, setChatOn, setRoomChatData, setRoomChatID}){
     const [option, setOption] = React.useState(false)
 
     const anchorRef = React.useRef(null);
@@ -38,7 +38,10 @@ function Sidebar({setContactOnOff, setChatOn}){
         window.location.reload()
     }
 
-    const handleClickRoomChat = () => {
+    const handleClickRoomChat = (data) => {
+        console.log(data)
+        setRoomChatData(data)
+        setRoomChatID(data.conversation_id)
         setChatOn()
     }
 
@@ -83,7 +86,13 @@ function Sidebar({setContactOnOff, setChatOn}){
             </div>
 
             <div className="sidebar__chats">
-                <SidebarChat selected onClick={handleClickRoomChat} />
+                {conversationState.map((data, index) => (
+                    <SidebarChat 
+                        key={index} 
+                        conversation={data} 
+                        selected 
+                        onClick={() => handleClickRoomChat(data)} />
+                ))}
                 <SidebarChat />
                 <SidebarChat />
             </div>
@@ -91,8 +100,14 @@ function Sidebar({setContactOnOff, setChatOn}){
     )
 }
 
-const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setChatOn, setContactOnOff}, dispatch)
+const mapStateToProps = (state) => {
+    return {
+        conversationState: state.conversation
+    }
 }
 
-export default connect(null, mapDispatchToProps)(Sidebar)
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({setContactOnOff, setChatOn, setRoomChatData, setRoomChatID}, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Sidebar)
