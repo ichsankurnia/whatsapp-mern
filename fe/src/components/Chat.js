@@ -10,16 +10,22 @@ import { AttachFile, MoreVert, SearchOutlined, InsertEmoticon, Mic } from "@mate
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setChatOn } from "./../redux/action/actions";
+import { setChatOn, setRoomChatID } from "./../redux/action/actions";
+import { addConversation, addMessageToConversation } from "../redux/action/conversationAction";
 
 import waOverview from './../assets/wa.png'
 import { useSocket } from "../contexts/SocketProvider";
+import { generateConversationID } from "./helper/helper";
 
 moment.tz.setDefault("Asia/Jakarta");
 
-function Chat({ messages, globalState }){                                        // props.messages
+function Chat({ /* messages, */ userState, globalState, conversationState, addConversation, addMessageToConversation, setRoomChatID }){                                        // props.messages
+    const [messages, setMessages] = useState([])
+    const [conversationID, setConversationID] = useState('')
     const [text, setText] = useState('')
     const socket = useSocket()
+    const userPhone = JSON.parse(localStorage.getItem('whatsapp-mern-user'))?.phone_number
+    const recipients = [userState.room_chat.phone_number]
 
 
     useEffect(() => {
@@ -33,21 +39,85 @@ function Chat({ messages, globalState }){                                       
     const sendMessage = async (e) => {
         e.preventDefault()
 
-        const payload = {
-            name: "ories",
-            message: text,
-            timestamp: moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A"),
-            received: true
-        }
+        // const payload = {
+        //     name: "ories",
+        //     message: text,
+        //     timestamp: moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A"),
+        //     received: true
+        // }
 
+        // if(text !== ''){
+        //     socket.emit('message', payload)
+        //     await axios.post('messages/new', payload)
+        // }
+        
         if(text !== ''){
-            socket.emit('message', payload)
-            await axios.post('messages/new', payload)
+            // socket.emit('send-message', payload)
+
+            checkConversationExist()
         }
 
         setText('')
     }
 
+    const checkConversationExist = () => {
+        
+        const payloadMessage = {
+            name: "ories",
+            text: text,
+            timestamp: moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A"),
+            sender: userPhone
+        }
+
+        const payloadConversation = {
+            conversation_id: conversationID,
+            group: false,
+            recipients,
+            message: payloadMessage
+        }
+        
+
+        if(recipients.length > 1){
+            payloadConversation.group = true
+        }else{
+            const filterConv = conversationState.filter(data => data.recipients.length === 1 && data.recipients[0] === userState.room_chat.phone_number)
+    
+            if(filterConv.length > 0){
+                console.log('conversation telah ada, add message to conversation')
+                setConversationID(filterConv[0].conversation_id)
+                
+                payloadConversation.conversation_id = filterConv[0].conversation_id
+                addMessageToConversation(filterConv[0].conversation_id, payloadMessage)
+                // addMessageToConversation(conversationID, payloadMesssage)
+            }else{
+                console.log('conversation belum ada')
+                const conversationId = gntConversationId()
+
+                setConversationID(conversationId)
+                setRoomChatID(conversationId)
+                payloadConversation.conversation_id = conversationId
+                addConversation(1, 3, createConversation(conversationState, payloadConversation))
+            }
+        }
+
+        socket.emit('send-message', payloadConversation)
+    }
+
+    const createConversation = (prevConversation, payloadConversation) => {
+        const { conversation_id, group, recipients, message } = payloadConversation
+
+        return [...prevConversation, {conversation_id, group, recipients, messages: [message]}]
+    }
+
+
+    const gntConversationId = () => {
+        const randomNumber = Math.floor((Math.random() * 100000) + 1).toString()
+
+        return generateConversationID(userPhone, randomNumber)
+    }
+
+    console.log(conversationState, userState.room_chat)
+    
     return (
         <>
         {globalState.chatOn?
@@ -56,8 +126,8 @@ function Chat({ messages, globalState }){                                       
                <Avatar />
 
                <div className="chat__headerInfo">
-                   <h3>Room name</h3>
-                   <p>Last seen at...</p>
+                   <h3>{userState.room_chat? userState.room_chat.username : "Room name"}</h3>
+                   <p>{userState.room_chat? userState.room_chat.phone_number : "Last seen at..."}</p>
                </div>
 
                <div className="chat__headerRight">
@@ -71,10 +141,11 @@ function Chat({ messages, globalState }){                                       
             </div>
 
             <div className="chat__body" id="chat__body">
-                {messages.map(({ name, message, timestamp, received }, key) => (                               // destructure object (data, key)
-                    <p className={`chat__message ${received && "chat__receiver"}`} key={key}>
+                {/* {messages.map(({ name, message, timestamp, received }, key) => (                               // destructure object (data, key) */}
+                {messages.map(({ name, text, timestamp, sender }, key) => (                               // destructure object (data, key)
+                    <p className={`chat__message ${sender === userPhone && "chat__receiver"}`} key={key}>
                         <span className="chat__name">{name}</span>
-                        {message}
+                        {text}
                         <span className="chat__timestamp">{timestamp}</span>
                     </p>
                 ))}
@@ -103,12 +174,14 @@ function Chat({ messages, globalState }){                                       
 
 const mapStateToProps = (state) => {
     return {
-        globalState: state.global
+        globalState: state.global,
+        userState: state.user,
+        conversationState: state.conversation
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setChatOn}, dispatch)
+    return bindActionCreators({setChatOn, setRoomChatID, addConversation, addMessageToConversation}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Chat)
