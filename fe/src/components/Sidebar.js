@@ -16,10 +16,10 @@ import MenuList from '@material-ui/core/MenuList';
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setChatOn, setContactOnOff, setRoomChatData, setRoomChatID } from "./../redux/action/actions";
+import { setChatOn, setContactOnOff, setFromChat, setRecipientsChat, setRoomChatData, setRoomChatID } from "./../redux/action/actions";
 
 
-function Sidebar({conversationState, setContactOnOff, setChatOn, setRoomChatData, setRoomChatID}){
+function Sidebar({userState, conversationState, setContactOnOff, setChatOn, setRoomChatData, setRoomChatID, setRecipientsChat, setFromChat}){
     const [option, setOption] = React.useState(false)
 
     const anchorRef = React.useRef(null);
@@ -40,8 +40,12 @@ function Sidebar({conversationState, setContactOnOff, setChatOn, setRoomChatData
 
     const handleClickRoomChat = (data) => {
         console.log(data)
-        setRoomChatData(data)
+        if(!data.group){
+            setRoomChatData(userState.list_contact.find(contacts => contacts.contact.phone_number = data.recipients[0]))            
+        }
         setRoomChatID(data.conversation_id)
+        setRecipientsChat(data.recipients)
+        setFromChat(true)
         setChatOn()
     }
 
@@ -102,12 +106,13 @@ function Sidebar({conversationState, setContactOnOff, setChatOn, setRoomChatData
 
 const mapStateToProps = (state) => {
     return {
+        userState: state.user,
         conversationState: state.conversation
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactOnOff, setChatOn, setRoomChatData, setRoomChatID}, dispatch)
+    return bindActionCreators({setContactOnOff, setChatOn, setRoomChatData, setRoomChatID, setRecipientsChat, setFromChat}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sidebar)
