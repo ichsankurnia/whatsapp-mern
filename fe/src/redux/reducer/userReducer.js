@@ -36,6 +36,24 @@ const userReducer = (state = initialState.user, action) => {
                 ...state,
                 room_chat: newRoomChat
             }
+        // SET Wheter chat click from list conversation or from contact
+        case ActionType.SET_FROM_CHAT:
+            return {
+                ...state,
+                from_chat: action.status
+            }
+        // SET GROUP CHAT STATUS
+        case ActionType.SET_GROUP_CHAT_STATUS:
+            return {
+                ...state,
+                group_chat: action.status
+            }
+        // SET RECIPIENTS FROM A ROOM CHAT
+        case ActionType.SET_RECIPIENST_CHAT:
+            return {
+                ...state,
+                recipients_chat: action.recipients
+            }
         default:
             return state
     }
