@@ -21,11 +21,11 @@ moment.tz.setDefault("Asia/Jakarta");
 
 function Chat({ /* messages, */ userState, globalState, conversationState, addConversation, addMessageToConversation, setRoomChatID }){                                        // props.messages
     const [messages, setMessages] = useState([])
-    const [conversationID, setConversationID] = useState('')
     const [text, setText] = useState('')
+    const [recipients, setRecipients] = useState([])
+    const [conversationID, setConversationID] = useState('')
     const socket = useSocket()
     const userPhone = JSON.parse(localStorage.getItem('whatsapp-mern-user'))?.phone_number
-    const recipients = [userState.room_chat.phone_number]
 
 
     useEffect(() => {
@@ -35,6 +35,23 @@ function Chat({ /* messages, */ userState, globalState, conversationState, addCo
 		}
 	}, [messages, globalState.chatOn])
 
+
+    useEffect(() => {
+        if (userState.from_chat){
+            // set message from list conversation
+            const listMessage = conversationState.find(conversation => conversation.conversation_id === userState.room_chat.room_chat_id).messages 
+            setRecipients(userState.recipients)
+            setMessages(listMessage)
+        }else{
+            const filterConv = conversationState.filter(data => data.recipients.length === 1 && data.recipients[0] === userState.room_chat.phone_number)
+            if(filterConv.length > 0){
+                console.log('conversation telah ada')
+                setMessages(filterConv[0].messages)
+            }else{
+                console.log('conversation belum ada')
+            }
+        }
+    }, [conversationState, userState.from_chat, userState.room_chat.phone_number, userState.room_chat.room_chat_id, userState.recipients])
 
     const sendMessage = async (e) => {
         e.preventDefault()
