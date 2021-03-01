@@ -9,6 +9,11 @@ const initialState = {
         room_chat: {
 
         },
+        from_chat: false,
+        group_chat: false,
+        recipients: [
+
+        ],
         contact_list: [
     
         ],
