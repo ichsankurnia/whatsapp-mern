@@ -8,7 +8,8 @@ import axios from "./../axios"
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { setContactOnOff, setContactList, setChatOn, setRoomChatData } from './../redux/action/actions'
+import { setContactOnOff, setContactList, setChatOn, } from './../redux/action/actions'
+import { setRecipientsChat, setRoomChatData } from '../redux/action/chatAction'
 
 
 function ContactChild(props){
@@ -25,7 +26,7 @@ function ContactChild(props){
     )
 }
 
-function Contact({id, setContactOnOff, userState, setContactList, setChatOn, setRoomChatData}){
+function Contact({id, setContactOnOff, userState, setContactList, setChatOn, setRoomChatData, setRecipientsChat}){
     const [NC, setNC] = React.useState(false)
     const [newContact, setNewContact] = React.useState('')
 
@@ -60,9 +61,10 @@ function Contact({id, setContactOnOff, userState, setContactList, setChatOn, set
 
     const handleClickContactToChat = (user) => {
         console.log(user)
+        setRoomChatData(user)
+        setRecipientsChat([user.phone_number])
         setContactOnOff(false)
         setChatOn(true)
-        setRoomChatData(user)
     }
 
     return (
@@ -125,7 +127,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactOnOff, setChatOn, setContactList, setRoomChatData}, dispatch)
+    return bindActionCreators({setContactOnOff, setChatOn, setContactList, setRoomChatData, setRecipientsChat}, dispatch)
 }
 
 
