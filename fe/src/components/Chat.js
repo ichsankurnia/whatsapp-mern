@@ -107,6 +107,7 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
                 setConversationID(filterConv[0].conversation_id)
                 
                 payloadConversation.conversation_id = filterConv[0].conversation_id
+                setRoomChatID(filterConv[0].conversation_id)
                 addMessageToConversation(filterConv[0].conversation_id, payloadMessage)
                 // addMessageToConversation(conversationID, payloadMesssage)
             }else{
