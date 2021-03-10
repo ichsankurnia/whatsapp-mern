@@ -19,7 +19,7 @@ import { CircularProgress } from '@material-ui/core';
 
 
 function Dashboard({id, globalState, setContactList, setConversationList, conversationState, addConversation, addMessageToConversation}) {
-	const [messages, setMessages] = useState([])
+	// const [messages, setMessages] = useState([])
 	const [showLoader, setShowLoader] = useState(true)
 
 	const socket = useSocket()
@@ -82,7 +82,7 @@ function Dashboard({id, globalState, setContactList, setConversationList, conver
 	useEffect( () => {
 		async function fetchData(){
 			try {
-				const res = await axios.get(`api/v1/user/${id}`)
+				const res = await axios.get(`api/v1/user-detail/${id}`)
 				console.log("GET USER BY ID", res)
 				
 				setContactList(res.data.data.contacts)
@@ -134,7 +134,7 @@ function Dashboard({id, globalState, setContactList, setConversationList, conver
 				:
 				<Sidebar id={id} />
 				}
-				<Chat messages={messages} />
+				<Chat /* messages={messages} */ />
 			</div>
 		</div>
 	);

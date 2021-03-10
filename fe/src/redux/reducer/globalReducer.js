@@ -2,7 +2,7 @@ import initialState from './intialState'
 import { ActionType } from '../action/actions'
 
 const globalReducer = (state = initialState.global, action) => {
-    console.log(action)
+    // console.log(action)
     switch (action.type){
         // Menampilkan isi chat saat mengclick room chat
         case ActionType.CHAT_ON:
