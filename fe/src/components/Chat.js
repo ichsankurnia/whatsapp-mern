@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import moment from 'moment-timezone';   
 import "./Chat.css"
 
-import axios from "./../axios"
+// import axios from "./../axios"
 // import socket from "./../socket";
 
 import { Avatar, IconButton } from "@material-ui/core";
@@ -10,7 +10,8 @@ import { AttachFile, MoreVert, SearchOutlined, InsertEmoticon, Mic } from "@mate
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setChatOn, setRoomChatID } from "./../redux/action/actions";
+import { setChatOn } from "./../redux/action/actions";
+import { setRoomChatID } from "../redux/action/chatAction";
 import { addConversation, addMessageToConversation } from "../redux/action/conversationAction";
 
 import waOverview from './../assets/wa.png'
@@ -19,7 +20,7 @@ import { generateConversationID } from "./helper/helper";
 
 moment.tz.setDefault("Asia/Jakarta");
 
-function Chat({ /* messages, */ userState, globalState, conversationState, addConversation, addMessageToConversation, setRoomChatID }){                                        // props.messages
+function Chat({ /* messages, */ globalState, conversationState, addConversation, addMessageToConversation, chatState, setRoomChatID }){                                        // props.messages
     const [messages, setMessages] = useState([])
     const [text, setText] = useState('')
     const [recipients, setRecipients] = useState([])
@@ -37,21 +38,21 @@ function Chat({ /* messages, */ userState, globalState, conversationState, addCo
 
 
     useEffect(() => {
-        if (userState.from_chat){
+        if (chatState.from_chat){
             // set message from list conversation
-            const listMessage = conversationState.find(conversation => conversation.conversation_id === userState.room_chat.room_chat_id).messages 
-            setRecipients(userState.recipients)
+            const listMessage = conversationState.find(conversation => conversation.conversation_id === chatState.room_chat_id).messages 
+            setRecipients(chatState.recipients_chat)
             setMessages(listMessage)
         }else{
-            const filterConv = conversationState.filter(data => data.recipients.length === 1 && data.recipients[0] === userState.room_chat.phone_number)
+            const filterConv = conversationState.filter(data => data.recipients.length === 1 && data.recipient === chatState.recipients_chat)
             if(filterConv.length > 0){
-                console.log('conversation telah ada')
+                // console.log('conversation telah ada')
                 setMessages(filterConv[0].messages)
             }else{
-                console.log('conversation belum ada')
+                // console.log('conversation belum ada')
             }
         }
-    }, [conversationState, userState.from_chat, userState.room_chat.phone_number, userState.room_chat.room_chat_id, userState.recipients])
+    }, [conversationState, chatState.from_chat, chatState.room_chat_id, chatState.recipients_chat])
 
     const sendMessage = async (e) => {
         e.preventDefault()
@@ -89,7 +90,7 @@ function Chat({ /* messages, */ userState, globalState, conversationState, addCo
         const payloadConversation = {
             conversation_id: conversationID,
             group: false,
-            recipients,
+            recipients: chatState.recipients_chat,
             message: payloadMessage
         }
         
@@ -97,7 +98,9 @@ function Chat({ /* messages, */ userState, globalState, conversationState, addCo
         if(recipients.length > 1){
             payloadConversation.group = true
         }else{
-            const filterConv = conversationState.filter(data => data.recipients.length === 1 && data.recipients[0] === userState.room_chat.phone_number)
+            const filterConv = conversationState.filter(data => data.recipients.length === 1 && data.recipients[0] === chatState.recipients_chat[0])
+            // const convExist = conversationState.filter(data => data.recipients.length === 1 && data.recipients[0] === chatState.recipients_chat[0])
+            console.log(filterConv)
     
             if(filterConv.length > 0){
                 console.log('conversation telah ada, add message to conversation')
@@ -116,6 +119,7 @@ function Chat({ /* messages, */ userState, globalState, conversationState, addCo
                 addConversation(1, 3, createConversation(conversationState, payloadConversation))
             }
         }
+        setMessages([...messages, payloadMessage])
 
         socket.emit('send-message', payloadConversation)
     }
@@ -133,7 +137,6 @@ function Chat({ /* messages, */ userState, globalState, conversationState, addCo
         return generateConversationID(userPhone, randomNumber)
     }
 
-    console.log(conversationState, userState.room_chat)
     
     return (
         <>
@@ -143,8 +146,8 @@ function Chat({ /* messages, */ userState, globalState, conversationState, addCo
                <Avatar />
 
                <div className="chat__headerInfo">
-                   <h3>{userState.room_chat? userState.room_chat.username : "Room name"}</h3>
-                   <p>{userState.room_chat? userState.room_chat.phone_number : "Last seen at..."}</p>
+                   <h3>{chatState.room_chat? chatState.room_chat.username : "Room name"}</h3>
+                   <p>{chatState.room_chat? chatState.room_chat.phone_number : "Last seen at..."}</p>
                </div>
 
                <div className="chat__headerRight">
@@ -159,20 +162,37 @@ function Chat({ /* messages, */ userState, globalState, conversationState, addCo
 
             <div className="chat__body" id="chat__body">
                 {/* {messages.map(({ name, message, timestamp, received }, key) => (                               // destructure object (data, key) */}
-                {messages.map(({ name, text, timestamp, sender }, key) => (                               // destructure object (data, key)
-                    <p className={`chat__message ${sender === userPhone && "chat__receiver"}`} key={key}>
-                        <span className="chat__name">{name}</span>
-                        {text}
-                        <span className="chat__timestamp">{timestamp}</span>
-                    </p>
-                ))}
+            
+                {chatState.group_chat?
+                    conversationState.find(conversation => conversation.conversation_id === chatState.room_chat_id)?
+                        conversationState.find(conversation => conversation.conversation_id === chatState.room_chat_id).messages.map(({ name, text, timestamp, sender }, key) => (                               // destructure object (data, key)
+                            <p className={`chat__message ${sender === userPhone && "chat__receiver"}`} key={key}>
+                                <span className="chat__name">{name}</span>
+                                {text}
+                                <span className="chat__timestamp">{timestamp}</span>
+                            </p>
+                        ))
+                        :
+                        null
+                    :
+                    conversationState.find(conversation => conversation.recipients[0] === chatState.recipients_chat[0])?
+                        conversationState.find(conversation => conversation.recipients[0] === chatState.recipients_chat[0]).messages.map(({ name, text, timestamp, sender }, key) => (                               // destructure object (data, key)
+                            <p className={`chat__message ${sender === userPhone && "chat__receiver"}`} key={key}>
+                                <span className="chat__name">{name}</span>
+                                {text}
+                                <span className="chat__timestamp">{timestamp}</span>
+                            </p>
+                        ))
+                        :
+                        null
+                }
             </div>
 
             <div className="chat__footer">
                 <InsertEmoticon />
                 <AttachFile />
                 <form>
-                    <input type="text" placeholder="Type a message" value={text} onChange={(e) => setText(e.target.value)} autoFocus={true} />
+                    <input type="text" placeholder="Type a message" value={text} onChange={(e) => setText(e.target.value)} autoFocus />
                     <button type="submit" onClick={sendMessage} />
                 </form>
                 <Mic />
@@ -192,8 +212,8 @@ function Chat({ /* messages, */ userState, globalState, conversationState, addCo
 const mapStateToProps = (state) => {
     return {
         globalState: state.global,
-        userState: state.user,
-        conversationState: state.conversation
+        conversationState: state.conversation,
+        chatState: state.chat
     }
 }
 
