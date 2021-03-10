@@ -207,6 +207,7 @@ io.on('connection', (socket) => {
     // })
 
     socket.on('send-message', ({ conversation_id, recipients, group, message }) => {
+        console.log(recipients)
         const { text, timestamp } = message
         recipients.forEach(recipient => {
             console.log(recipient, text)

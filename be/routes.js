@@ -8,7 +8,8 @@ import {
     deleteUser,
     truncateUser ,
     updateProfile,
-    getProfile
+    getProfile,
+    getDetailUser
 } from "./app/controllers/controller-user.js";
 import login from "./app/middlewares/authenticate.js"
 import isAuthenticate from "./app/middlewares/verify-token.js"
@@ -36,6 +37,7 @@ Router.post('/user/sign-in', login)
 
 // User
 Router.get('/user', getAllUser)
+Router.get('/user-detail/:id', getDetailUser)
 Router.get('/user/:id', getOneUser)
 Router.post('/user', createNewUser)
 Router.patch('/user/:id', updateUser)

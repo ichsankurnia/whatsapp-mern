@@ -85,13 +85,14 @@ const getAllUser = async (req, res) => {
 }
 
 
-const getOneUser = async (req, res) => {
+const getDetailUser = async (req, res) => {
     try {
         const { id } = req.params
-        const data = await User.findById(id).select(['_id', 'username', 'password', 'email', 'phone_number']).populate([
+
+        const populateCollection = [
             {
                 path: "profile_id",
-                select: ['fullname', 'photo', 'about'],
+                // select: ['fullname', 'photo', 'about'],
                 model: "c_profiles"
             },
             {
@@ -109,14 +110,52 @@ const getOneUser = async (req, res) => {
                     }
                 }
             }
-        ])
+        ]
 
-        if(data){
-            res.status(200).send({code: 0, message: "success get user by id", data: data})
+        const getDataByPhone = await User.findOne({phone_number: idPhoneNumber(id)}).populate(populateCollection)
+        
+        if(getDataByPhone){
+            return res.status(200).send({code: 0, message: "success get user by phone_number", data: getDataByPhone})
         }else{
-            res.status(400).send({code: 1, message: `data with id '${id}' doesn't exist`, data: data})
+            const data = await User.findById(id).populate(populateCollection)
+            
+            if(data){
+                return res.status(200).send({code: 0, message: "success get user by id", data: data})
+            }
         }
+        return res.status(400).send({code: 1, message: `data with id '${id}' doesn't exist`, data: null})
     } catch (error) {
+        return res.status(400).json({code: 1, message: error.message, data: null})
+    }
+}
+
+
+const getOneUser = async (req, res) => {
+    try {
+        const { id } = req.params
+        
+        const columnSelected = ['_id', 'username', 'password', 'email', 'phone_number']
+        const populateCollection = [
+            {
+                path: "profile_id",
+                select: ['fullname', 'photo', 'about'],
+                model: "c_profiles"
+            }
+        ]
+
+        const getDataByPhone = await User.findOne({phone_number: idPhoneNumber(id)}).select(columnSelected).populate(populateCollection)
+        if(getDataByPhone){
+            return res.status(200).send({code: 0, message: "success get user by phone_number", data: getDataByPhone})
+        }else{
+            const data = await User.findById(id).select(columnSelected).populate(populateCollection)
+            
+            if(data){
+                return res.status(200).send({code: 0, message: "success get user by id", data: data})
+            }
+        }
+        return res.status(400).send({code: 1, message: `data with id '${id}' doesn't exist`, data: null})
+    } catch (error) {
+        console.log(error)
         return res.status(400).json({code: 1, message: error.message, data: null})
     }
 }
@@ -227,6 +266,7 @@ export {
     registerUser, 
     createNewUser, 
     getAllUser, 
+    getDetailUser,
     getOneUser, 
     updateUser, 
     deleteUser,
