@@ -6,6 +6,17 @@ const initialState = {
     user: {
         user_id: "",
         phone_number: "",
+        contact_list: [
+    
+        ],
+        conversation_list: [
+    
+        ],
+    },
+    chat: {
+        room_chat_id: {
+
+        },
         room_chat: {
 
         },
@@ -13,12 +24,6 @@ const initialState = {
         group_chat: false,
         recipients: [
 
-        ],
-        contact_list: [
-    
-        ],
-        conversation_list: [
-    
         ],
     },
     conversations: [
