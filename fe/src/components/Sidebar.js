@@ -16,10 +16,11 @@ import MenuList from '@material-ui/core/MenuList';
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { setChatOn, setContactOnOff, setFromChat, setRecipientsChat, setRoomChatData, setRoomChatID } from "./../redux/action/actions";
+import { setChatOn, setContactOnOff, } from "./../redux/action/actions";
+import { setFromChat, setRecipientsChat, setRoomChatData, setRoomChatID } from "../redux/action/chatAction";
 
 
-function Sidebar({userState, conversationState, setContactOnOff, setChatOn, setRoomChatData, setRoomChatID, setRecipientsChat, setFromChat}){
+function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chatState, setRoomChatData, setRoomChatID, setRecipientsChat, setFromChat}){
     const [option, setOption] = React.useState(false)
 
     const anchorRef = React.useRef(null);
@@ -39,16 +40,26 @@ function Sidebar({userState, conversationState, setContactOnOff, setChatOn, setR
     }
 
     const handleClickRoomChat = (data) => {
-        console.log(data)
+        // console.log(data)
+        // console.log(userState.contact_list, data.recipients[0])
         if(!data.group){
-            setRoomChatData(userState.list_contact.find(contacts => contacts.contact.phone_number = data.recipients[0]))            
+            // const userChat = contactList.find(contacts => contacts.contact.phone_number = data.recipients[0]).contact 
+            // const userChat = userState.contact_list.filter(contacts => contacts.contact.phone_number = data.recipients[0])[0]?.contact 
+            // console.log(userState.contact_list)
+            const contactList = userState.contact_list
+            contactList.forEach(contact => {
+                if(contact.contact.phone_number === data.recipients[0]){
+                    console.log(contact.contact)
+                    setRoomChatData(contact.contact)            
+                }
+            });
         }
         setRoomChatID(data.conversation_id)
         setRecipientsChat(data.recipients)
         setFromChat(true)
         setChatOn()
     }
-
+    
     return (
         <div className="sidebar">
             
@@ -94,7 +105,7 @@ function Sidebar({userState, conversationState, setContactOnOff, setChatOn, setR
                     <SidebarChat 
                         key={index} 
                         conversation={data} 
-                        selected 
+                        selected={chatState.room_chat_id === data.conversation_id? true : false}
                         onClick={() => handleClickRoomChat(data)} />
                 ))}
                 <SidebarChat />
@@ -107,7 +118,8 @@ function Sidebar({userState, conversationState, setContactOnOff, setChatOn, setR
 const mapStateToProps = (state) => {
     return {
         userState: state.user,
-        conversationState: state.conversation
+        conversationState: state.conversation,
+        chatState: state.chat
     }
 }
 
