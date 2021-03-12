@@ -33,6 +33,10 @@ const userSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_contacts"
     }],
+    groups: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "c_groups"
+    }],
     // as foreignKey relation to Conversation Schema
     conversations: [{
         type: mongoose.Schema.Types.ObjectId,
