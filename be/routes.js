@@ -25,6 +25,7 @@ import {
     getMsgBySenderOrReceiver, 
     newMessage 
 } from "./app/controllers/controller-message.js";
+import { addNewGroup, deleteGroup } from "./app/controllers/controller-group.js";
 
 
 const Router = express.Router();
@@ -53,6 +54,11 @@ Router.patch('/user/profile/:profile_id', updateProfile)
 Router.get('/contact/:user_id', getContactbyUserId)
 Router.post('/contact', addContact)
 Router.delete('/contact', deleteContact)
+
+
+// Group
+Router.post('/group', addNewGroup)
+Router.delete('/group/:id', deleteGroup)
 
 
 // Message
