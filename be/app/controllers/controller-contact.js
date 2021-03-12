@@ -7,61 +7,70 @@ const addContact = async (req, res) => {
     try {
         const { user_id, new_contact } = req.body
         
-        const findOwner = await User.findOne({_id: user_id})
-        const findContact = await User.findOne({phone_number: idPhoneNumber(new_contact)})
+        var findOwner = await User.findOne({phone_number: idPhoneNumber(user_id)})
+        
+        if(!findOwner) {
+            findOwner = await User.findOne({_id: user_id})
+            if(!findOwner) return res.status(400).json({code: 1, message: `owner with _id or phone number '${user_id}' not found ☹️`, data: null})
+        }
         
         if(findOwner.phone_number === idPhoneNumber(new_contact)) return res.status(400).json({code: 1, message: `you can't add yourself as a contact lol 😝`, data: null})
         
-        if(!findOwner) return res.status(400).json({code: 1, message: `owner with user id '${user_id}' not found ☹️`, data: null})
+        console.log(findOwner)
+        
+        var findContact = await User.findOne({phone_number: idPhoneNumber(new_contact)})
         
         if(!findContact){
-            return res.status(400).json({code: 1, message: `the new contact with phone number '${new_contact}' not found ☹️`, data: null})
-        }else{
-            const newContactId = findContact._id
+            findContact = await User.findOne({_id: new_contact})
+            if(!findContact) return res.status(400).json({code: 1, message: `the new contact with _id or phone number '${new_contact}' not found ☹️`, data: null})
+        }
 
-            const data = await Contact.create({
-                user_id: user_id,
-                contact: newContactId
-            })
-    
-            if(data){
-                // jika contact berhasil ditambahkan, update collection user pada column/document contact
-                const addContactToUser = await User.findByIdAndUpdate(
-                                            data.user_id,
-                                            { 
-                                                $push: { contacts: data._id } 
-                                            },
-                                            { 
-                                                new: true, useFindAndModify: false 
-                                            }
-                                        )
-                if(addContactToUser){
-                    const findContact = await User.findOne({_id: user_id}).select(['_id']).populate([
-                        {
-                            path: "contacts",
-                            select: ['contact'],
-                            model: "c_contacts",
+
+        console.log(findContact)
+
+        const data = await Contact.create({
+            user_id: findOwner._id,
+            contact: findContact._id
+        })
+
+        if(data){
+            // jika contact berhasil ditambahkan, update collection user pada column/document contact
+            const addContactToUser = await User.findByIdAndUpdate(
+                                        data.user_id,
+                                        { 
+                                            $push: { contacts: data._id } 
+                                        },
+                                        { 
+                                            new: true, useFindAndModify: false 
+                                        }
+                                    )
+            if(addContactToUser){
+                const findContact = await User.findOne({_id: user_id}).select(['_id']).populate([
+                    {
+                        path: "contacts",
+                        select: ['contact'],
+                        model: "c_contacts",
+                        populate: {
+                            path: 'contact',
+                            select: ['username', 'email', 'phone_number'],
+                            model: 'c_users',
                             populate: {
-                                path: 'contact',
-                                select: ['username', 'email', 'phone_number'],
-                                model: 'c_users',
-                                populate: {
-                                    path: 'profile_id',
-                                    select: ['fullname', 'photo', 'about'],
-                                    model: 'c_profiles'
-                                }
+                                path: 'profile_id',
+                                select: ['fullname', 'photo', 'about'],
+                                model: 'c_profiles'
                             }
                         }
-                    ])
+                    }
+                ])
 
-                    return res.status(201).json({code: 0, message: `success add contact to user id '${user_id}' 😆`, data: findContact})
-                }
+                return res.status(201).json({code: 0, message: `success add contact to user id '${user_id}' 😆`, data: findContact})
             }
+        }else{
             return res.status(400).json({code: 1, message: `fail add contact to user id '${user_id}' ☹️`, data: null})
         }
     } catch (error) {
         console.log(error.message)
-        return res.status(400).json({code: 1, message: `Hei this number already exist in your contact, try with the new one 😝`, data: null})
+        return res.status(400).json({code: 1, message: `${error.message} 😝`, data: null})
     }
 }
 
