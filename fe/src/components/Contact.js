@@ -1,7 +1,7 @@
 import React from 'react'
 import './Contact.css'
 
-import { AddCircle, ArrowBack, PersonAdd, SearchOutlined } from '@material-ui/icons'
+import { AddCircle, ArrowBack, GroupAdd, PersonAdd, SearchOutlined } from '@material-ui/icons'
 import { Avatar, IconButton } from '@material-ui/core'
 
 import axios from "./../axios"
@@ -26,14 +26,79 @@ function ContactChild(props){
     )
 }
 
+function GroupChild(props){
+    const { contact } = props
+
+    return (
+        <div className="sidebarChat">
+            <Avatar />
+            <div className="sidebarChat__info" onClick={() => props.onClickContactChat(contact)}>
+                <h2>{contact?.username}</h2>
+                <p>{contact?.profile_id?.about}</p>
+            </div>
+        </div>
+    )
+}
+
+function NewGroup({contactList, showNG}){
+    const [groupName, setGroupName] = React.useState('')
+    const [groupMember, setGroupMember] = React.useState([])
+
+    const handleChangeCheckBoxNewGroup = (e) => {
+        // e.preventDefault()
+        // if checkbox is checked add phone_number to list, else remove them from list
+        if(e.target.checked){
+            if(!groupMember.find(member => member === e.target.value)){
+                setGroupMember([...groupMember, e.target.value])
+            }
+        }else{
+            setGroupMember(groupMember.filter(member => member !== e.target.value))
+        }
+    }
+
+    const handleAddNewGroup = () => {
+        if(groupMember.length > 0){
+            console.log(groupMember)
+            showNG(false)
+        }else{
+            alert('Please select member of group first !')
+        }
+    }
+
+    return (
+        <>
+            <div className="contact__searchNew">
+                {/* <div className="sidebar__searchContainer"> */}
+                    <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Type group name" style={{fontSize: 25}} />
+                {/* </div> */}
+            </div>
+            <div className="contact__newGroup" style={{marginBottom: 20}}>
+                {contactList.map((contact, index) => (
+                    <div key={index}>
+                        <input type='checkbox' id={contact.contact.phone_number} value={contact.contact.phone_number} onChange={handleChangeCheckBoxNewGroup} />
+                        <label htmlFor={contact.contact.phone_number}>
+                            {contact.contact.username}
+                        </label>
+                    </div>    
+                ))}
+            </div>
+            <IconButton className="contact_groupAddIcon" onClick={handleAddNewGroup}>
+                <AddCircle />
+            </IconButton>
+        </>
+    )    
+}
+
 function Contact({id, setContactOnOff, userState, setContactList, setChatOn, setRoomChatData, setRecipientsChat}){
     const [NC, setNC] = React.useState(false)
+    const [showNG, setShowNG] = React.useState(false)
     const [newContact, setNewContact] = React.useState('')
 
     const handleArrowBackClick = (e) => {
         e.preventDefault()
 
         if(NC) setNC(!NC)
+        else if(showNG) setShowNG(!showNG)
         else setContactOnOff(false)
     }
 
@@ -67,24 +132,28 @@ function Contact({id, setContactOnOff, userState, setContactList, setChatOn, set
         setChatOn(true)
     }
 
+
     return (
         <div className="contact">
             <div className="contact__header">
                 <IconButton onClick={handleArrowBackClick}>
                     <ArrowBack />
                 </IconButton>
-                <p>{NC? 'Add new contact' : 'New chat'}</p>
+                <p>{NC? 'Add new contact' : showNG? 'Add New Group' : 'New chat'}</p>
             </div>
 
             {NC?
-            <div className="contact__searchNew">
-                {/* <div className="sidebar__searchContainer"> */}
-                    <input type="text" value={newContact} onChange={(e) => setNewContact(e.target.value)} placeholder="Type phone number to add" style={{fontSize: 25}} />
-                {/* </div> */}
-                <IconButton onClick={handleAddNewContact}>
-                    <AddCircle />
-                </IconButton>
-            </div>
+                <div className="contact__searchNew">
+                    {/* <div className="sidebar__searchContainer"> */}
+                        <input type="text" value={newContact} onChange={(e) => setNewContact(e.target.value)} placeholder="Type phone number to add" style={{fontSize: 25}} />
+                    {/* </div> */}
+                    <IconButton onClick={handleAddNewContact}>
+                        <AddCircle />
+                    </IconButton>
+                </div>
+            :
+            showNG?
+               <NewGroup contactList={userState.contact_list} showNG={(bool) => setShowNG(bool)} />
             :
             <>
                 <div className="sidebar__search">
@@ -112,6 +181,18 @@ function Contact({id, setContactOnOff, userState, setContactList, setChatOn, set
                     ))}
                     <ContactChild />
                     <ContactChild />
+                </div>
+                <div className="sidebar__chats">
+                    <div className="sidebarChat" onClick={() => setShowNG(!showNG)}>
+                        {/* <IconButton> */}
+                            <GroupAdd />
+                        {/* </IconButton> */}
+                        <div className="sidebarChat__info">
+                            <h2>New Group</h2>
+                        </div>
+                    </div>
+                    <GroupChild />
+                    <GroupChild />
                 </div>
             </>
             }
