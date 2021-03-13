@@ -24,7 +24,8 @@ const groupSchema = mongoose.Schema({
         required: [true, 'phone number is required']
     }],
     group_maker: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "c_users"
     },
     created_at: {
         type: String,
