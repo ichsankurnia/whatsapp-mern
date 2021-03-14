@@ -9,7 +9,7 @@ const groupSchema = mongoose.Schema({
     },
     group_name: {
         type: String,
-        unique: true,
+        // unique: true,
         required: [true, 'group name is required']
     },
     group_desc: {
@@ -20,7 +20,7 @@ const groupSchema = mongoose.Schema({
     },
     group_member: [{
         type: String,
-        unique: true,
+        // unique: true,
         required: [true, 'phone number is required']
     }],
     group_maker: {
