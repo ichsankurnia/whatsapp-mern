@@ -31,6 +31,8 @@ import {
     getAllGroups, 
     getGroupsByUser, 
     getOneGroups, 
+    addGroupMember,
+    removeGroupMember, 
     updateGroup 
 } from "./app/controllers/controller-group.js";
 
@@ -65,9 +67,11 @@ Router.delete('/contact', deleteContact)
 
 // Group
 Router.post('/group', addNewGroup)
-Router.get('/group/', getAllGroups)
+Router.get('/group', getAllGroups)
 Router.get('/group/:id', getOneGroups)
 Router.get('/group-user/:id', getGroupsByUser)
+Router.post('/group-new-member', addGroupMember)
+Router.post('/group-remove-member', removeGroupMember)
 Router.patch('/group/:id', updateGroup)
 Router.delete('/group/:id', deleteGroup)
 

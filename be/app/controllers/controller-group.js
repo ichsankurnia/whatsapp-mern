@@ -12,6 +12,7 @@ function checkIfDuplicateExists(w){
 const addNewGroup = async (req, res) => {
     try {
         const { group_member } = req.body
+        var correctListGroupMember = []
 
         if(group_member.length === 0) return res.status(400).json({code: 1, message: `group member is empty ☹️`, data: null})
         
@@ -19,10 +20,14 @@ const addNewGroup = async (req, res) => {
 
         // Check wheter phone number is existed
         await Promise.all(group_member.map(async (phoneNumber) => {
+            correctListGroupMember.push(idPhoneNumber(phoneNumber))
             const findUser = await User.findOne({phone_number: idPhoneNumber(phoneNumber)})
 
             if(!findUser) return res.status(400).json({code: 1, message: `group member with phone_number '${phoneNumber}' doesn't exist ☹️`, data: null})
         }))
+        
+
+        req.body.group_member = correctListGroupMember
         
         // // Create group
         const data = await Group.create(req.body)
@@ -169,6 +174,9 @@ const getGroupsByUser = async (req, res) => {
         ])
 
         if(data) {
+            if(data.groups.length === 0){
+                return res.status(404).json({code: 1, message: `user with id '${id}' doesn't have any of groups ☹️`, data: null})
+            }
             return res.status(200).json({code: 0, message: `success get group by user id '${id}' 😆`, data})
         }else{
             return res.status(404).json({code: 1, message: `group with user id '${id}' doesn't exist ☹️`, data: null})
@@ -209,11 +217,123 @@ const updateGroup = async (req, res) => {
 }
 
 
+const addGroupMember = async (req, res) => {
+    try {
+        const { group_id, group_member } = req.body
+
+        if(group_member.length === 0) return res.status(400).json({code: 1, message: `group member is empty ☹️`, data: null})
+        
+        const ObjectId = mongoose.Types.ObjectId;
+        const objId = new ObjectId( (group_id.length < 12) ? "123456789012" : group_id );
+        
+        const findGroup = await Group.findOne({ 
+            $or: [ { _id: objId }, { group_id }, ]
+        })
+        
+        if(!findGroup ) return res.status(404).json({code: 1, message: `group with id '${group_id} not found ☹️`, data: null})
+
+        await Promise.all(group_member.map(async (phoneNumber) => {
+            await Group.findOneAndUpdate(
+                {
+                    $or: [ { _id: objId }, { group_id }, ]
+                },
+                { 
+                    $push: { group_member: idPhoneNumber(phoneNumber) } 
+                },
+                { 
+                    new: true, useFindAndModify: false  
+                }
+            )
+            await User.findOneAndUpdate(
+                {
+                    phone_number: idPhoneNumber(phoneNumber)
+                },
+                { 
+                    $push: { groups: findGroup._id } 
+                },
+                { 
+                    new: true, useFindAndModify: false 
+                }
+            )
+        }))
+
+        const updatedData = await Group.findOne({ 
+            $or: [ { _id: objId }, { group_id }, ]
+        }).populate([
+            {
+                path: "group_maker",
+                select: ['phone_number'],
+                model: "c_users",
+            }
+        ])
+
+        return res.status(201).json({code: 0, message: `success add new member to group id '${group_id}' 😆`, data: updatedData})
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({code: 1, message: `${error.message} ☹️`, data: null})
+    }
+}
+
+
+const removeGroupMember = async (req, res) => {
+    try {
+        const { group_id, group_member } = req.body
+
+        if(group_member.length === 0) return res.status(400).json({code: 1, message: `group member is empty ☹️`, data: null})
+        
+        const ObjectId = mongoose.Types.ObjectId;
+        const objId = new ObjectId( (group_id.length < 12) ? "123456789012" : group_id );
+        
+        const findGroup = await Group.findOne({ 
+            $or: [ { _id: objId }, { group_id }, ]
+        })
+        
+        if(!findGroup ) return res.status(404).json({code: 1, message: `group with id '${group_id} not found ☹️`, data: null})
+
+        await Promise.all(group_member.map(async (phoneNumber) => {
+            await Group.findOneAndUpdate(
+                {
+                    $or: [ { _id: objId }, { group_id }, ]
+                },
+                {
+                    $pull : { group_member: idPhoneNumber(phoneNumber) }
+                }
+            )
+            await User.findOneAndUpdate(
+                {
+                    phone_number: idPhoneNumber(phoneNumber)
+                },
+                {
+                    $pull : { groups: findGroup._id }
+                }
+            )
+        }))
+
+        const updatedData = await Group.findOne({ 
+            $or: [ { _id: objId }, { group_id }, ]
+        }).populate([
+            {
+                path: "group_maker",
+                select: ['phone_number'],
+                model: "c_users",
+            }
+        ])
+
+        return res.status(201).json({code: 0, message: `success remove member of group id '${group_id}' 😆`, data: updatedData})
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({code: 1, message: `${error.message} ☹️`, data: null})
+    }
+}
+
+
 export {
     addNewGroup,
     deleteGroup,
     getAllGroups,
     getOneGroups,
     getGroupsByUser,
-    updateGroup
+    updateGroup,
+    addGroupMember,
+    removeGroupMember
 }
