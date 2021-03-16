@@ -26,7 +26,7 @@ function App() {
 		}else{
 			localStorage.clear()
 		}
-	}, [token])
+	}, [])																														// eslint-disable-line
 
 	const dashboard = (
 		<SocketProvider id={user?.phone_number}>
