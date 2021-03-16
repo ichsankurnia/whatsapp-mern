@@ -8,17 +8,18 @@ import axios from "./../axios"
 
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { setContactOnOff, setContactList, setChatOn, } from './../redux/action/actions'
-import { setRecipientsChat, setRoomChatData } from '../redux/action/chatAction'
+import { setContactOnOff, setContactList, setChatOn, setGroupList, } from './../redux/action/actions'
+import { setFromChat, setGroupChatStatus, setRecipientsChat, setRoomChatData, setRoomChatID } from '../redux/action/chatAction'
+import NewGroup from './NewGroup'
 
 
 function ContactChild(props){
     const { contact } = props
-
+    
     return (
-        <div className="sidebarChat">
+        <div className="sidebarChat" onClick={() => props.onClickContactChat(contact)}>
             <Avatar />
-            <div className="sidebarChat__info" onClick={() => props.onClickContactChat(contact)}>
+            <div className="sidebarChat__info">
                 <h2>{contact?.username}</h2>
                 <p>{contact?.profile_id?.about}</p>
             </div>
@@ -27,69 +28,21 @@ function ContactChild(props){
 }
 
 function GroupChild(props){
-    const { contact } = props
+    const { group } = props
 
     return (
-        <div className="sidebarChat">
+        <div className="sidebarChat"  onClick={() => props.onClickGroupChat(group)}>
             <Avatar />
-            <div className="sidebarChat__info" onClick={() => props.onClickContactChat(contact)}>
-                <h2>{contact?.username}</h2>
-                <p>{contact?.profile_id?.about}</p>
+            <div className="sidebarChat__info">
+                <h2>{group?.group_name}</h2>
+                <p>{group?.group_desc}</p>
             </div>
         </div>
     )
 }
 
-function NewGroup({contactList, showNG}){
-    const [groupName, setGroupName] = React.useState('')
-    const [groupMember, setGroupMember] = React.useState([])
 
-    const handleChangeCheckBoxNewGroup = (e) => {
-        // e.preventDefault()
-        // if checkbox is checked add phone_number to list, else remove them from list
-        if(e.target.checked){
-            if(!groupMember.find(member => member === e.target.value)){
-                setGroupMember([...groupMember, e.target.value])
-            }
-        }else{
-            setGroupMember(groupMember.filter(member => member !== e.target.value))
-        }
-    }
-
-    const handleAddNewGroup = () => {
-        if(groupMember.length > 0){
-            console.log(groupMember)
-            showNG(false)
-        }else{
-            alert('Please select member of group first !')
-        }
-    }
-
-    return (
-        <>
-            <div className="contact__searchNew">
-                {/* <div className="sidebar__searchContainer"> */}
-                    <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Type group name" style={{fontSize: 25}} />
-                {/* </div> */}
-            </div>
-            <div className="contact__newGroup" style={{marginBottom: 20}}>
-                {contactList.map((contact, index) => (
-                    <div key={index}>
-                        <input type='checkbox' id={contact.contact.phone_number} value={contact.contact.phone_number} onChange={handleChangeCheckBoxNewGroup} />
-                        <label htmlFor={contact.contact.phone_number}>
-                            {contact.contact.username}
-                        </label>
-                    </div>    
-                ))}
-            </div>
-            <IconButton className="contact_groupAddIcon" onClick={handleAddNewGroup}>
-                <AddCircle />
-            </IconButton>
-        </>
-    )    
-}
-
-function Contact({id, setContactOnOff, userState, setContactList, setChatOn, setRoomChatData, setRecipientsChat}){
+function Contact({id, setContactOnOff, userState, setContactList, setGroupList, setChatOn, setRoomChatData, setRoomChatID, setRecipientsChat, setGroupChatStatus}){
     const [NC, setNC] = React.useState(false)
     const [showNG, setShowNG] = React.useState(false)
     const [newContact, setNewContact] = React.useState('')
@@ -124,10 +77,18 @@ function Contact({id, setContactOnOff, userState, setContactList, setChatOn, set
         }
     }
 
-    const handleClickContactToChat = (user) => {
-        console.log(user)
-        setRoomChatData(user)
-        setRecipientsChat([user.phone_number])
+    const handleClickContactToChat = (data) => {
+        console.log(data)
+        if(data.group_id){
+            setRoomChatID(data.group_id)
+            setRecipientsChat(data.group_member.filter(r => r !== JSON.parse(localStorage.getItem('whatsapp-mern-user')).phone_number))
+            setGroupChatStatus(true)
+        }else{
+            setRecipientsChat([data.phone_number])
+            setGroupChatStatus(false)
+        }
+        setRoomChatData(data)
+        setFromChat(false)
         setContactOnOff(false)
         setChatOn(true)
     }
@@ -153,7 +114,11 @@ function Contact({id, setContactOnOff, userState, setContactList, setChatOn, set
                 </div>
             :
             showNG?
-               <NewGroup contactList={userState.contact_list} showNG={(bool) => setShowNG(bool)} />
+               <NewGroup 
+                contactList={userState.contact_list} 
+                groupList={userState.group_list} 
+                setGroupList={setGroupList} 
+                showNG={(bool) => setShowNG(bool)} />
             :
             <>
                 <div className="sidebar__search">
@@ -179,8 +144,6 @@ function Contact({id, setContactOnOff, userState, setContactList, setChatOn, set
                             onClickContactChat={handleClickContactToChat} 
                         />
                     ))}
-                    <ContactChild />
-                    <ContactChild />
                 </div>
                 <div className="sidebar__chats">
                     <div className="sidebarChat" onClick={() => setShowNG(!showNG)}>
@@ -191,8 +154,13 @@ function Contact({id, setContactOnOff, userState, setContactList, setChatOn, set
                             <h2>New Group</h2>
                         </div>
                     </div>
-                    <GroupChild />
-                    <GroupChild />
+                    {userState.group_list && userState.group_list.map((group, key) => (
+                        <GroupChild 
+                            key={key} 
+                            group={group}
+                            onClickGroupChat={handleClickContactToChat}
+                        />
+                    ))}
                 </div>
             </>
             }
@@ -208,7 +176,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactOnOff, setChatOn, setContactList, setRoomChatData, setRecipientsChat}, dispatch)
+    return bindActionCreators({setContactOnOff, setChatOn, setContactList, setGroupList, setRoomChatData, setRoomChatID, setRecipientsChat, setGroupChatStatus}, dispatch)
 }
 
 
