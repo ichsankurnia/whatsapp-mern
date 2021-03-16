@@ -109,7 +109,12 @@ const getDetailUser = async (req, res) => {
                         model: 'c_profiles'
                     }
                 }
-            }
+            },
+            {
+                path: "groups",
+                // select: ['fullname', 'photo', 'about'],
+                model: "c_groups"
+            },
         ]
 
         const getDataByPhone = await User.findOne({phone_number: idPhoneNumber(id)}).populate(populateCollection)
