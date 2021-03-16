@@ -11,14 +11,14 @@ import Contact from './Contact';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { setContactList, setConversationList } from '../redux/action/actions';
+import { setContactList, setConversationList, setGroupList } from '../redux/action/actions';
 import { addConversation, addMessageToConversation } from '../redux/action/conversationAction';
 
 import { useSocket } from '../contexts/SocketProvider';
 import { CircularProgress } from '@material-ui/core';
 
 
-function Dashboard({id, globalState, setContactList, setConversationList, conversationState, addConversation, addMessageToConversation}) {
+function Dashboard({id, globalState, setContactList, setGroupList, setConversationList, conversationState, addConversation, addMessageToConversation}) {
 	// const [messages, setMessages] = useState([])
 	const [showLoader, setShowLoader] = useState(true)
 
@@ -86,6 +86,7 @@ function Dashboard({id, globalState, setContactList, setConversationList, conver
 				console.log("GET USER BY ID", res)
 				
 				setContactList(res.data.data.contacts)
+				setGroupList(res.data.data.groups)
 				setConversationList(res.data.data?.conversation)
 				setShowLoader(false)
 			} catch (error) {
@@ -96,7 +97,7 @@ function Dashboard({id, globalState, setContactList, setConversationList, conver
 		}
 
 		fetchData()
-	}, [id, setContactList, setConversationList])
+	}, [id, setContactList, setGroupList, setConversationList])
 
 
 	// useEffect(() => {
@@ -149,7 +150,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactList, setConversationList, addConversation, addMessageToConversation}, dispatch)
+    return bindActionCreators({setContactList, setGroupList, setConversationList, addConversation, addMessageToConversation}, dispatch)
 }
 
 
