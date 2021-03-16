@@ -6,6 +6,7 @@ export const ActionType = {
     SET_PHONE_NUMBER: "SET_PHONE_NUMBER",
     SET_CONTACT_LIST: "SET_CONTACT_LIST",
     SET_CONVERSATION_LIST: "SET_CONVERSATION_LIST",
+    SET_GROUP_LIST: "SET_GROUP_LIST"
 }
 
 export const setChatOn = (payload) => {
@@ -40,5 +41,12 @@ export const setConversationList = (listConversation) => {
     return {
         type: ActionType.SET_CONVERSATION_LIST,
         data: listConversation
+    }
+}
+
+export const setGroupList = (listGroup) => {
+    return {
+        type: ActionType.SET_GROUP_LIST,
+        data: listGroup
     }
 }

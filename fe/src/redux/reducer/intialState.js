@@ -12,6 +12,9 @@ const initialState = {
         conversation_list: [
     
         ],
+        group_list: [
+
+        ]
     },
     chat: {
         room_chat_id: {
@@ -22,7 +25,7 @@ const initialState = {
         },
         from_chat: false,
         group_chat: false,
-        recipients: [
+        recipients_chat: [
 
         ],
     },

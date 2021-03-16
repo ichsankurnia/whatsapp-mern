@@ -14,6 +14,11 @@ const userReducer = (state = initialState.user, action) => {
                 ...state,
                 conversation_list: action.data
             }
+        case ActionType.SET_GROUP_LIST:
+            return {
+                ...state,
+                group_list: action.data
+            }
         case ActionType.SET_USER_ID:
             return {
                 ...state,
