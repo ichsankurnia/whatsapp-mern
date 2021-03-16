@@ -60,7 +60,9 @@ const getTimeStamp = () => {
 //     return (hour+":"+minit+":"+second)
 // }
 
-export const generateConversationID = (phoneNumber, randomNumber) => {
+export const generateConversationID = (phoneNumber) => {
+    const randomNumber = Math.floor((Math.random() * 100000) + 1).toString()
+
     let lastPhoneNumber = phoneNumber.substring(phoneNumber.length - 5, phoneNumber.length)
     let convID = getTimeStamp() + lastPhoneNumber + randomNumber
     return convID
