@@ -42,7 +42,7 @@ function GroupChild(props){
 }
 
 
-function Contact({id, setContactOnOff, userState, setContactList, setGroupList, setChatOn, setRoomChatData, setRoomChatID, setRecipientsChat, setGroupChatStatus}){
+function Contact({id, setContactOnOff, userState, setContactList, setGroupList, setChatOn, setRoomChatData, setRoomChatID, setRecipientsChat, setGroupChatStatus, setFromChat}){
     const [NC, setNC] = React.useState(false)
     const [showNG, setShowNG] = React.useState(false)
     const [newContact, setNewContact] = React.useState('')
@@ -78,7 +78,6 @@ function Contact({id, setContactOnOff, userState, setContactList, setGroupList, 
     }
 
     const handleClickContactToChat = (data) => {
-        console.log(data)
         if(data.group_id){
             setRoomChatID(data.group_id)
             setRecipientsChat(data.group_member.filter(r => r !== JSON.parse(localStorage.getItem('whatsapp-mern-user')).phone_number))
@@ -176,7 +175,11 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactOnOff, setChatOn, setContactList, setGroupList, setRoomChatData, setRoomChatID, setRecipientsChat, setGroupChatStatus}, dispatch)
+    return bindActionCreators({
+        setContactOnOff, setChatOn, 
+        setContactList, setGroupList, 
+        setRoomChatData, setRoomChatID, setRecipientsChat, setGroupChatStatus, setFromChat
+    }, dispatch)
 }
 
 

@@ -17,10 +17,10 @@ import MenuList from '@material-ui/core/MenuList';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { setChatOn, setContactOnOff, } from "./../redux/action/actions";
-import { setFromChat, setRecipientsChat, setRoomChatData, setRoomChatID } from "../redux/action/chatAction";
+import { setFromChat, setGroupChatStatus, setRecipientsChat, setRoomChatData, setRoomChatID } from "../redux/action/chatAction";
 
 
-function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chatState, setRoomChatData, setRoomChatID, setRecipientsChat, setFromChat}){
+function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chatState, setRoomChatData, setRoomChatID, setRecipientsChat, setGroupChatStatus, setFromChat}){
     const [option, setOption] = React.useState(false)
 
     const anchorRef = React.useRef(null);
@@ -41,7 +41,6 @@ function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chat
 
     const handleClickRoomChat = (data) => {
         // console.log(data)
-        // console.log(userState.contact_list, data.recipients[0])
         if(!data.group){
             // const userChat = contactList.find(contacts => contacts.contact.phone_number = data.recipients[0]).contact 
             // const userChat = userState.contact_list.filter(contacts => contacts.contact.phone_number = data.recipients[0])[0]?.contact 
@@ -49,10 +48,14 @@ function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chat
             const contactList = userState.contact_list
             contactList.forEach(contact => {
                 if(contact.contact.phone_number === data.recipients[0]){
-                    console.log(contact.contact)
+                    // console.log(contact.contact)
                     setRoomChatData(contact.contact)            
                 }
             });
+            setGroupChatStatus(false)
+        }else{
+            setRoomChatData(userState.group_list.find(group => group.group_id === data.conversation_id))
+            setGroupChatStatus(true)
         }
         setRoomChatID(data.conversation_id)
         setRecipientsChat(data.recipients)
@@ -124,7 +127,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactOnOff, setChatOn, setRoomChatData, setRoomChatID, setRecipientsChat, setFromChat}, dispatch)
+    return bindActionCreators({setContactOnOff, setChatOn, setRoomChatData, setRoomChatID, setRecipientsChat, setGroupChatStatus, setFromChat}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Sidebar)
