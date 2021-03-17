@@ -23,8 +23,8 @@ moment.tz.setDefault("Asia/Jakarta");
 function Chat({ /* messages, */ globalState, conversationState, addConversation, addMessageToConversation, chatState, setRoomChatID }){                                        // props.messages
     const [messages, setMessages] = useState([])
     const [text, setText] = useState('')
-    const [recipients, setRecipients] = useState([])
     const [conversationID, setConversationID] = useState('')
+
     const socket = useSocket()
     const userPhone = JSON.parse(localStorage.getItem('whatsapp-mern-user'))?.phone_number
 
@@ -36,23 +36,6 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
 		}
 	}, [messages, globalState.chatOn])
 
-
-    useEffect(() => {
-        if (chatState.from_chat){
-            // set message from list conversation
-            const listMessage = conversationState.find(conversation => conversation.conversation_id === chatState.room_chat_id).messages 
-            setRecipients(chatState.recipients_chat)
-            setMessages(listMessage)
-        }else{
-            const filterConv = conversationState.filter(data => data.recipients.length === 1 && data.recipient === chatState.recipients_chat)
-            if(filterConv.length > 0){
-                // console.log('conversation telah ada')
-                setMessages(filterConv[0].messages)
-            }else{
-                // console.log('conversation belum ada')
-            }
-        }
-    }, [conversationState, chatState.from_chat, chatState.room_chat_id, chatState.recipients_chat])
 
     const sendMessage = async (e) => {
         e.preventDefault()
@@ -95,8 +78,25 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
         }
         
 
-        if(recipients.length > 1){
+        if(chatState.room_chat.group_id){
             payloadConversation.group = true
+
+            const filterConv = conversationState.filter(data => data.conversation_id === chatState.room_chat_id)
+    
+            if(filterConv.length > 0){
+                console.log('conversation telah ada, add message to conversation')
+                setConversationID(filterConv[0].conversation_id)
+                
+                payloadConversation.conversation_id = filterConv[0].conversation_id
+                addMessageToConversation(filterConv[0].conversation_id, payloadMessage)
+                // addMessageToConversation(conversationID, payloadMesssage)
+            }else{
+                console.log('conversation belum ada')
+
+                setConversationID(chatState.room_chat_id)
+                payloadConversation.conversation_id = chatState.room_chat_id
+                addConversation(1, 3, createConversation(conversationState, payloadConversation))
+            }
         }else{
             const filterConv = conversationState.filter(data => data.recipients.length === 1 && data.recipients[0] === chatState.recipients_chat[0])
             // const convExist = conversationState.filter(data => data.recipients.length === 1 && data.recipients[0] === chatState.recipients_chat[0])
@@ -133,12 +133,10 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
 
 
     const gntConversationId = () => {
-        const randomNumber = Math.floor((Math.random() * 100000) + 1).toString()
-
-        return generateConversationID(userPhone, randomNumber)
+        return generateConversationID(userPhone)
     }
-
     
+
     return (
         <>
         {globalState.chatOn?
@@ -147,8 +145,16 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
                <Avatar />
 
                <div className="chat__headerInfo">
-                   <h3>{chatState.room_chat? chatState.room_chat.username : "Room name"}</h3>
-                   <p>{chatState.room_chat? chatState.room_chat.phone_number : "Last seen at..."}</p>
+                   <h3>{chatState.group_chat? chatState.room_chat.group_name : chatState.room_chat? chatState.room_chat.username : "Room name"}</h3>
+                   <div style={{display: "flex", color: 'gray'}}>
+                   {chatState.group_chat?
+                        chatState.room_chat.group_member.map((phoneNumber) => (
+                            <p key={phoneNumber}>{phoneNumber},&nbsp;</p>
+                            ))
+                            :
+                            <p>{chatState.room_chat? chatState.room_chat.phone_number : "Last seen at..."}</p>
+                        }
+                    </div>
                </div>
 
                <div className="chat__headerRight">
@@ -176,8 +182,8 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
                         :
                         null
                     :
-                    conversationState.find(conversation => conversation.recipients[0] === chatState.recipients_chat[0])?
-                        conversationState.find(conversation => conversation.recipients[0] === chatState.recipients_chat[0]).messages.map(({ name, text, timestamp, sender }, key) => (                               // destructure object (data, key)
+                    conversationState.find(conversation => conversation.group === false && conversation.recipients[0] === chatState.recipients_chat[0])?
+                        conversationState.find(conversation => conversation.group === false && conversation.recipients[0] === chatState.recipients_chat[0]).messages.map(({ name, text, timestamp, sender }, key) => (                               // destructure object (data, key)
                             <p className={`chat__message ${sender === userPhone && "chat__receiver"}`} key={key}>
                                 <span className="chat__name">{name}</span>
                                 {text}
