@@ -1,9 +1,11 @@
-import User from "../../models/user.js"
-import Profile from "../../models/profile.js"
-import Contact from "../../models/contact.js";
-import moment from 'moment';   
-import { encryptAes } from "../helper/encrypt.js";
-import { idPhoneNumber } from "../helper/helper.js";
+const moment = require('moment')
+
+const User = require("../../models/user")
+const Profile = require("../../models/profile")
+const Contact = require("../../models/contact")
+
+const { encryptAes } = require("../helper/encrypt")
+const { idPhoneNumber } = require("../helper/helper")
 
 
 const registerUser = async (req, res) => {
@@ -267,7 +269,7 @@ const updateProfile = async (req, res) => {
 }
 
 
-export { 
+module.exports = { 
     registerUser, 
     createNewUser, 
     getAllUser, 

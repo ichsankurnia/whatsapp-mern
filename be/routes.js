@@ -1,5 +1,5 @@
-import express from "express";
-import { 
+const express = require('express')
+const { 
     registerUser,
     createNewUser, 
     getAllUser, 
@@ -10,22 +10,22 @@ import {
     updateProfile,
     getProfile,
     getDetailUser
-} from "./app/controllers/controller-user.js";
-import login from "./app/middlewares/authenticate.js"
-import isAuthenticate from "./app/middlewares/verify-token.js"
-import { 
+} = require("./app/controllers/controller-user")
+const login = require("./app/middlewares/authenticate")
+const isAuthenticate = require("./app/middlewares/verify-token.js")
+const { 
     addContact, 
     getContactbyUserId, 
     deleteContact 
-} from "./app/controllers/controller-contact.js";
-import { 
+} = require("./app/controllers/controller-contact")
+const { 
     deleteMessage, 
     getAllMessage, 
     getMsgBySenderAndReceiver, 
     getMsgBySenderOrReceiver, 
     newMessage 
-} from "./app/controllers/controller-message.js";
-import { 
+} = require("./app/controllers/controller-message")
+const { 
     addNewGroup, 
     deleteGroup, 
     getAllGroups, 
@@ -34,7 +34,7 @@ import {
     addGroupMember,
     removeGroupMember, 
     updateGroup 
-} from "./app/controllers/controller-group.js";
+} = require ("./app/controllers/controller-group.js")
 
 
 const Router = express.Router();
@@ -84,4 +84,4 @@ Router.post('/message/sender-or-receiver', getMsgBySenderOrReceiver)
 Router.delete('/message/delete/:id', deleteMessage)
 
 
-export default Router
+module.exports = Router

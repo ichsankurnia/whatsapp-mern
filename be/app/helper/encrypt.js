@@ -1,4 +1,4 @@
-import CryptoJS from "crypto-js";
+const CryptoJS = require("crypto-js")
 
 
 const { AES_KEY, AES_IV } = process.env
@@ -73,4 +73,9 @@ const base64Decode = (base64) => {
     }
 }
 
-export {encryptAes, decryptAes, base64Encode, base64Decode}
+module.exports = {
+    encryptAes,
+    decryptAes, 
+    base64Encode, 
+    base64Decode
+}

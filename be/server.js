@@ -1,24 +1,20 @@
 // Importing
-import express from "express";
-import mongoose from "mongoose";
-import Pusher from "pusher"
-import cors from "cors";
-import dotenv from "dotenv"
-import moment from 'moment';
-import "moment-timezone"
+const express = require('express')
+const mongoose = require('mongoose');
+const Pusher = require("pusher")
+const cors = require('cors')
+const moment = require('moment')
+require('moment-timezone')
+require('dotenv').config()
 
-import Messages from "./dbMessages.js";
-import route from "./routes.js";
-import GlobalVariable from "./app/helper/globalVariable.js";
+const Messages = require('./dbMessages')
+const route = require('./routes')
+const GlobalVariable = require('./app/helper/globalVariable')
 
-
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 
 // app config
 const app = express()
 const port = process.env.PORT || 9000
-dotenv.config()
 
 var server = require('http').createServer(app);
 var io = require('socket.io')(server, {

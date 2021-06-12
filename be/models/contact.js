@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import moment from 'moment';   
+const mongoose = require("mongoose")
+const moment = require('moment')   
 
 
 const contactSchema = mongoose.Schema({
@@ -25,4 +25,4 @@ const contactSchema = mongoose.Schema({
 
 
 // Collection
-export default mongoose.model('c_contacts', contactSchema)
+module.exports = mongoose.model('c_contacts', contactSchema)

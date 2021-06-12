@@ -1,4 +1,4 @@
-export const idPhoneNumber = (phoneNumber) => {
+const idPhoneNumber = (phoneNumber) => {
     try {
         if(phoneNumber.charAt(0) === "0"){
             return `62${phoneNumber.substring(1, phoneNumber.length)}`
@@ -9,4 +9,8 @@ export const idPhoneNumber = (phoneNumber) => {
         console.log(error)
         return phoneNumber
     }
+}
+
+module.exports = {
+    idPhoneNumber
 }

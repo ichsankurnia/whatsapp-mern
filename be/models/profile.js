@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import moment from 'moment';   
+const mongoose = require("mongoose")
+const moment = require('moment')   
 
 
 const profileSchema = mongoose.Schema({
@@ -32,4 +32,4 @@ const profileSchema = mongoose.Schema({
 
 
 // Collection
-export default mongoose.model('c_profiles', profileSchema)
+module.exports = mongoose.model('c_profiles', profileSchema)

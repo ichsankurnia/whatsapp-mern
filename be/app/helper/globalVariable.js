@@ -18,4 +18,4 @@ class GlobalVariable {
     }
 }
 
-export default GlobalVariable
+module.exports = GlobalVariable

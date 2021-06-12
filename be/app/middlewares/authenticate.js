@@ -1,11 +1,9 @@
-import jwt from "jsonwebtoken";
-import User from "../../models/user.js";
-import { encryptAes } from "../helper/encrypt.js";
-import { idPhoneNumber } from "../helper/helper.js";
+const jwt = require("jsonwebtoken")
+const User = require("../../models/user.js")
+const { encryptAes } = require("../helper/encrypt.js")
+const { idPhoneNumber } = require("../helper/helper.js")
 
-import dotenv from "dotenv"
-dotenv.config()
-
+require('dotenv').config()
 
 const checkUserExist = async (user) => {
     try {
@@ -86,4 +84,4 @@ const login = async (req, res) => {
     }
 }
 
-export default login
+module.exports = login

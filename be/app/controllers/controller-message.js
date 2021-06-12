@@ -1,5 +1,5 @@
-import Message from "../../models/message.js";
-import User from "../../models/user.js";
+const Message = require("../../models/message")
+const User = require("../../models/user")
 
 
 const newMessage = async (req, res) => {
@@ -102,7 +102,7 @@ const deleteMessage = async (req, res) => {
 }
 
 
-export {
+module.exports = {
     newMessage,
     getAllMessage,
     getMsgBySenderAndReceiver,

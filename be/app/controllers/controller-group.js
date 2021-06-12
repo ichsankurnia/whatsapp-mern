@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
-import Group from "../../models/group.js";
-import User from "../../models/user.js";
-import { idPhoneNumber } from "../helper/helper.js";
-import moment from 'moment';   
+const mongoose = require("mongoose")
+const Group = require("../../models/group")
+const User = require("../../models/user")
+const { idPhoneNumber } = require("../helper/helper")
+const moment = require('moment')
 
 
 function checkIfDuplicateExists(w){
@@ -327,7 +327,7 @@ const removeGroupMember = async (req, res) => {
 }
 
 
-export {
+module.exports = {
     addNewGroup,
     deleteGroup,
     getAllGroups,

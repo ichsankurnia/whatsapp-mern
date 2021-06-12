@@ -1,6 +1,6 @@
-import Contact from "../../models/contact.js";
-import User from "../../models/user.js";
-import { idPhoneNumber } from "../helper/helper.js";
+const Contact = require("../../models/contact")
+const User = require("../../models/user")
+const { idPhoneNumber } = require("../helper/helper")
 
 
 const addContact = async (req, res) => {
@@ -155,7 +155,7 @@ const deleteContact = async (req, res) => {
 }
 
 
-export {
+module.exports = {
     addContact,
     getContactbyUserId,
     deleteContact

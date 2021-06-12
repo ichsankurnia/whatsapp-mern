@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import moment from 'moment';   
+const mongoose = require("mongoose")
+const moment = require('moment')
 
 const groupSchema = mongoose.Schema({
     group_id: {
@@ -39,4 +39,4 @@ const groupSchema = mongoose.Schema({
 
 
 // Collection
-export default mongoose.model('c_groups', groupSchema)
+module.exports = mongoose.model('c_groups', groupSchema)
