@@ -54,7 +54,7 @@ app.use(cors())
 
 // DB config
 const { DB_NAME, DB_USER, DB_PASS } = process.env
-
+console.log("DB AUTH :", DB_NAME, DB_USER, DB_PASS)
 // const connection_url = `mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.ynrf1.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`
 // const connection_url = `mongodb+srv://${DB_USER}:${DB_PASS}@cluster0.ynrf1.mongodb.net/${DB_NAME}?authSource=admin&compressors=zlib&retryWrites=true&w=majority&ssl=true`
 const connection_url = `mongodb://${DB_USER}:${DB_PASS}@cluster0-shard-00-00.ynrf1.mongodb.net:27017,cluster0-shard-00-01.ynrf1.mongodb.net:27017,cluster0-shard-00-02.ynrf1.mongodb.net:27017/${DB_NAME}?ssl=true&replicaSet=atlas-12isqv-shard-0&authSource=admin&retryWrites=true&w=majority`
