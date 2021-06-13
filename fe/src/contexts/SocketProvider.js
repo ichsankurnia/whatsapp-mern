@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import io from 'socket.io-client'
+import { baseURL } from '../axios'
 
 const SocketContext = React.createContext()
 
@@ -12,7 +13,7 @@ export function SocketProvider({ id, children }) {
 
     useEffect(() => {
         const newSocket = io(
-            'http://localhost:9000',
+            baseURL,
             { query: { id } }
         )
         setSocket(newSocket)
