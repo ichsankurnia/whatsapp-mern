@@ -58,6 +58,56 @@ const addNewGroup = async (req, res) => {
 }
 
 
+const addGroupWithSocket = async (payload) => {
+    try {
+        const { group_member } = payload
+        var correctListGroupMember = []
+
+        if(group_member.length === 0) return {code: 1, message: `group member is empty ☹️`, data: null}
+        
+        if(checkIfDuplicateExists(group_member)) return {code: 1, message: `group member contains duplicate number ☹️`, data: null}
+
+        // Check wheter phone number is existed
+        await Promise.all(group_member.map(async (phoneNumber) => {
+            correctListGroupMember.push(idPhoneNumber(phoneNumber))
+            const findUser = await User.findOne({phone_number: idPhoneNumber(phoneNumber)})
+
+            if(!findUser) return {code: 1, message: `group member with phone_number '${phoneNumber}' doesn't exist ☹️`, data: null}
+        }))
+        
+
+        payload.group_member = correctListGroupMember
+        
+        // // Create group
+        const data = await Group.create(payload)
+
+        if(data){
+            await Promise.all(group_member.map(async (phoneNumber) => {
+                await User.findOneAndUpdate(
+                    {
+                        phone_number: idPhoneNumber(phoneNumber)
+                    },
+                    { 
+                        $push: { groups: data._id } 
+                    },
+                    { 
+                        new: true, useFindAndModify: false 
+                    }
+                )
+            })) 
+        }else{
+            return {code: 1, message: `failed create a new groups ☹️`, data: null}
+        }
+
+        return {code: 0, message: 'success create new group', data}
+    } catch (error) {
+        console.log(error)
+        return {code: 1, message: `${error.message} ☹️`, data: null}
+    }
+
+}
+
+
 const deleteGroup = async (req, res) => {
     try {
         const { id } = req.params
@@ -335,5 +385,6 @@ export {
     getGroupsByUser,
     updateGroup,
     addGroupMember,
-    removeGroupMember
+    removeGroupMember,
+    addGroupWithSocket
 }
