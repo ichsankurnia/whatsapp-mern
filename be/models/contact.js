@@ -9,7 +9,7 @@ const contactSchema = mongoose.Schema({
         ref: "c_users"
     },
     contact: {
-        unique: true,
+        // unique: true,
         type: mongoose.Schema.Types.ObjectId,
         ref: "c_users"
     },
