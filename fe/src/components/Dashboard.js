@@ -18,7 +18,7 @@ import { useSocket } from '../contexts/SocketProvider';
 import { CircularProgress } from '@material-ui/core';
 
 
-function Dashboard({id, globalState, setContactList, setGroupList, setConversationList, conversationState, addConversation, addMessageToConversation}) {
+function Dashboard({id, globalState, userState, setContactList, setGroupList, setConversationList, conversationState, addConversation, addMessageToConversation}) {
 	// const [messages, setMessages] = useState([])
 	const [showLoader, setShowLoader] = useState(true)
 
@@ -62,6 +62,7 @@ function Dashboard({id, globalState, setContactList, setGroupList, setConversati
 		socket.on('receive-message', (conversation) => {
 			const exist = obj => obj.conversation_id === conversation.conversation_id;
 
+			console.log(conversation)
 			console.log(conversationState.some(exist))
 
 			if(conversationState.some(exist)){
@@ -73,9 +74,19 @@ function Dashboard({id, globalState, setContactList, setGroupList, setConversati
 
 		})
 
-		return () => socket.off('receive-message')
+		socket.on('add-group-res', (res) => {
+			console.log('New Group', res)
+			if(res.code === 0){
+                setGroupList([...userState.group_list, res.data])
+			}
+		})
 
-	}, [socket, conversationState, addNewConversation, addMessageToConversation])
+		return () => {
+			socket.off('receive-message')
+			socket.off('add-group-res')
+		} 
+
+	}, [socket, userState.group_list, conversationState, addNewConversation, addMessageToConversation, setGroupList])
 
 
 
@@ -145,7 +156,8 @@ function Dashboard({id, globalState, setContactList, setGroupList, setConversati
 const mapStateToProps = (state) => {
     return {
         globalState: state.global,
-		conversationState: state.conversation
+		conversationState: state.conversation,
+		userState: state.user
     }
 }
 

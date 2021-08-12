@@ -4,14 +4,15 @@ import './Contact.css'
 import { AddCircle } from '@material-ui/icons'
 import { IconButton } from '@material-ui/core'
 
-import axios from "./../axios"
-
 import { generateConversationID } from './helper/helper'
+import { useSocket } from '../contexts/SocketProvider'
 
 
-function NewGroup({contactList, groupList, setGroupList, showNG}){
+function NewGroup({contactList, showNG}){
     const [groupName, setGroupName] = React.useState('')
     const [groupMember, setGroupMember] = React.useState([])
+
+    const socket = useSocket()
 
     const handleChangeCheckBoxNewGroup = (e) => {
         // if checkbox is checked add phone_number to list, else remove them from list
@@ -38,10 +39,7 @@ function NewGroup({contactList, groupList, setGroupList, showNG}){
                     "group_maker": JSON.parse(localStorage.getItem('whatsapp-mern-user'))._id
                 }
     
-                const res = await axios.post(`api/v1/group`, payload)
-                
-                console.log("Add new group :", res.data.data)
-                setGroupList([...groupList, res.data.data])
+                socket.emit('add-group', payload)
     
                 showNG(false)
             } catch (error) {
