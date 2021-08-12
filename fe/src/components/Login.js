@@ -38,6 +38,7 @@ function Login({submitToken, submitUser}){
                 console.log(res)
                 alert(res.data.message)
                 moveToSignUp()
+                setShowLoader(false)
             }).catch((err) => {
                 if(err.response) alert(err.response.data.message)
                 else alert(JSON.parse(JSON.stringify(err)).message)
