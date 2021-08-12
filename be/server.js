@@ -10,6 +10,7 @@ import "moment-timezone"
 import Messages from "./dbMessages.js";
 import route from "./routes.js";
 import GlobalVariable from "./app/helper/globalVariable.js";
+import { addGroupWithSocket } from "./app/controllers/controller-group.js";
 
 
 import { createRequire } from 'module';
@@ -222,6 +223,15 @@ io.on('connection', (socket) => {
                     sender: id, text, timestamp
                 }
             })
+        })
+    })
+
+    socket.on('add-group', async (payload) => {
+        const recipients = payload.group_member
+        const addGroup = await addGroupWithSocket(payload)
+
+        recipients.forEach(recipient => {
+            socket.broadcast.to(recipient).emit('add-group-res', addGroup)
         })
     })
 
