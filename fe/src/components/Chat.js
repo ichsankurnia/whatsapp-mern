@@ -20,13 +20,14 @@ import { generateConversationID } from "./helper/helper";
 
 moment.tz.setDefault("Asia/Jakarta");
 
-function Chat({ /* messages, */ globalState, conversationState, addConversation, addMessageToConversation, chatState, setRoomChatID }){                                        // props.messages
+function Chat({ /* messages, */userState, globalState, conversationState, addConversation, addMessageToConversation, chatState, setRoomChatID }){                                        // props.messages
     const [messages, setMessages] = useState([])
     const [text, setText] = useState('')
     const [conversationID, setConversationID] = useState('')
-
+    
     const socket = useSocket()
-    const userPhone = JSON.parse(localStorage.getItem('whatsapp-mern-user'))?.phone_number
+    const user = JSON.parse(localStorage.getItem('whatsapp-mern-user'))
+    const userPhone = user?.phone_number
 
 
     useEffect(() => {
@@ -64,7 +65,7 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
     const checkConversationExist = () => {
         
         const payloadMessage = {
-            name: "ories",
+            name: user?.profile_id?.fullname ||user?.username,
             text: text,
             timestamp: moment(new Date()).format("dddd, DD-MM-YYYY hh:mm:ss A"),
             sender: userPhone
@@ -76,6 +77,8 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
             recipients: chatState.recipients_chat,
             message: payloadMessage
         }
+
+        console.log()
         
 
         if(chatState.room_chat.group_id){
@@ -136,7 +139,6 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
         return generateConversationID(userPhone)
     }
     
-
     return (
         <>
         {globalState.chatOn?
@@ -174,7 +176,9 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
                     conversationState.find(conversation => conversation.conversation_id === chatState.room_chat_id)?
                         conversationState.find(conversation => conversation.conversation_id === chatState.room_chat_id).messages.map(({ name, text, timestamp, sender }, key) => (                               // destructure object (data, key)
                             <p className={`chat__message ${sender === userPhone && "chat__receiver"}`} key={key}>
-                                <span className="chat__name">{name}</span>
+                                <span className="chat__name">
+                                    {name || (userState.contact_list.find(data => data.contact.phone_number === sender)? userState.contact_list.find(data => data.contact.phone_number === sender).contact.username || userState.contact_list.find(data => data.contact.phone_number === sender).contact.profile_id.fullname : sender) }                                    
+                                    </span>
                                 {text}
                                 <span className="chat__timestamp">{timestamp}</span>
                             </p>
@@ -185,7 +189,9 @@ function Chat({ /* messages, */ globalState, conversationState, addConversation,
                     conversationState.find(conversation => conversation.group === false && conversation.recipients[0] === chatState.recipients_chat[0])?
                         conversationState.find(conversation => conversation.group === false && conversation.recipients[0] === chatState.recipients_chat[0]).messages.map(({ name, text, timestamp, sender }, key) => (                               // destructure object (data, key)
                             <p className={`chat__message ${sender === userPhone && "chat__receiver"}`} key={key}>
-                                <span className="chat__name">{name}</span>
+                                <span className="chat__name">
+                                    {name || (userState.contact_list.find(data => data.contact.phone_number === sender)? userState.contact_list.find(data => data.contact.phone_number === sender).contact.username || userState.contact_list.find(data => data.contact.phone_number === sender).contact.profile_id.fullname : sender) }
+                                </span>
                                 {text}
                                 <span className="chat__timestamp">{timestamp}</span>
                             </p>
@@ -220,7 +226,8 @@ const mapStateToProps = (state) => {
     return {
         globalState: state.global,
         conversationState: state.conversation,
-        chatState: state.chat
+        chatState: state.chat,
+        userState: state.user
     }
 }
 
