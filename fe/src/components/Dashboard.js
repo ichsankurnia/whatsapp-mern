@@ -12,13 +12,13 @@ import Contact from './Contact';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { setContactList, setConversationList, setGroupList } from '../redux/action/actions';
-import { addConversation, addMessageToConversation } from '../redux/action/conversationAction';
+import { addConversation, addMessageToConversation, updateConversationID } from '../redux/action/conversationAction';
 
 import { useSocket } from '../contexts/SocketProvider';
 import { CircularProgress } from '@material-ui/core';
 
 
-function Dashboard({id, globalState, userState, setContactList, setGroupList, setConversationList, conversationState, addConversation, addMessageToConversation}) {
+function Dashboard({id, globalState, userState, setContactList, setGroupList, setConversationList, conversationState, addConversation, addMessageToConversation, updateConversationID}) {
 	// const [messages, setMessages] = useState([])
 	const [showLoader, setShowLoader] = useState(true)
 
@@ -59,17 +59,23 @@ function Dashboard({id, globalState, userState, setContactList, setGroupList, se
 
 		// socket.on('receive-message', (data) => {
 			// console.log(data)
-		socket.on('receive-message', (conversation) => {
-			const exist = obj => obj.conversation_id === conversation.conversation_id;
+		socket.on('receive-message', async (conversation) => {
+			const {conversation_id, group, recipients, message} = conversation
+			const exist = obj => obj.conversation_id === conversation_id;
 
 			console.log(conversation)
 			console.log(conversationState.some(exist))
 
 			if(conversationState.some(exist)){
 				console.log('conversation telah ada, add message to conversation')
-				addMessageToConversation(conversation.conversation_id, conversation.message)
+				addMessageToConversation(conversation_id, message)
 			}else{
-				addNewConversation(conversation)
+				if( !group && conversationState.find(conv => conv.recipients.length === 1 && conv.recipients[0] === recipients[0]) ){
+					updateConversationID(conversation_id, recipients, message)
+					// addMessageToConversation(conversation_id, message)
+				}else{
+					addNewConversation(conversation)
+				}
 			}
 
 		})
@@ -77,7 +83,9 @@ function Dashboard({id, globalState, userState, setContactList, setGroupList, se
 		socket.on('add-group-res', (res) => {
 			console.log('New Group', res)
 			if(res.code === 0){
-                setGroupList([...userState.group_list, res.data])
+				if(!userState.group_list.find(data => data.group_id === res.data.group_id )){
+					setGroupList([...userState.group_list, res.data])
+				}
 			}
 		})
 
@@ -86,7 +94,7 @@ function Dashboard({id, globalState, userState, setContactList, setGroupList, se
 			socket.off('add-group-res')
 		} 
 
-	}, [socket, userState.group_list, conversationState, addNewConversation, addMessageToConversation, setGroupList])
+	}, [socket, userState.group_list, conversationState, addNewConversation, addMessageToConversation, updateConversationID, setGroupList])
 
 
 
@@ -162,7 +170,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setContactList, setGroupList, setConversationList, addConversation, addMessageToConversation}, dispatch)
+    return bindActionCreators({setContactList, setGroupList, setConversationList, addConversation, addMessageToConversation, updateConversationID}, dispatch)
 }
 
 
