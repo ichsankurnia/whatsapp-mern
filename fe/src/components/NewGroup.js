@@ -8,7 +8,7 @@ import { generateConversationID } from './helper/helper'
 import { useSocket } from '../contexts/SocketProvider'
 
 
-function NewGroup({contactList, showNG}){
+function NewGroup({contactList, groupList, setGroupList, showNG}){
     const [groupName, setGroupName] = React.useState('')
     const [groupMember, setGroupMember] = React.useState([])
 
@@ -40,6 +40,7 @@ function NewGroup({contactList, showNG}){
                 }
     
                 socket.emit('add-group', payload)
+                setGroupList([...groupList, payload])
     
                 showNG(false)
             } catch (error) {
