@@ -77,11 +77,9 @@ function Chat({ /* messages, */userState, globalState, conversationState, addCon
             recipients: chatState.recipients_chat,
             message: payloadMessage
         }
-
-        console.log()
         
 
-        if(chatState.room_chat.group_id){
+        if(chatState.group_chat){
             payloadConversation.group = true
 
             const filterConv = conversationState.filter(data => data.conversation_id === chatState.room_chat_id)
