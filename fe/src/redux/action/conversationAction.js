@@ -2,6 +2,7 @@ export const ActionTypeConversation = {
     SET_CONVERSATION_LIST: "SET_CONVERSATION_LIST",
     ADD_CONVERSATION: "ADD_CONVERSATION",
     ADD_MESSAGE_TO_CONVERSATION: "ADD_MESSAGE_TO_CONVERSATION",
+    UPDATE_CONVERSATION_ID: "UPDATE_CONVERSATION_ID"
 }
 
 export const setConversationList = (listConversation) => {
@@ -25,5 +26,14 @@ export const addMessageToConversation = (conversationId, message) => {
         type: ActionTypeConversation.ADD_MESSAGE_TO_CONVERSATION,
         id: conversationId,
         newMessage: message
+    }
+}
+
+export const updateConversationID = (newConvID, recipients, message) => {
+    return {
+        type: ActionTypeConversation.UPDATE_CONVERSATION_ID,
+        recipients,
+        new_id: newConvID,
+        new_msg: message
     }
 }
