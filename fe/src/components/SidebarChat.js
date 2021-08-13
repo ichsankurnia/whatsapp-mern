@@ -35,7 +35,7 @@ function SidebarChat({selected, onClick, conversation, userState}){
                     //     <h2 key={index}>{data}</h2>
                     // ))
                 }
-                <p>{conversation?.messages[conversation.messages.length - 1].text}</p>
+                <p>{conversation?.messages[conversation.messages.length - 1]?.text}</p>
                 {/* <h2>Room Name</h2> */}
                 {/* <p>This is the last message</p> */}
             </div>

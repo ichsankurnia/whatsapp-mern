@@ -1,6 +1,7 @@
 import React from "react";
 import "./Sidebar.css";
 import SidebarChat from "./SidebarChat";
+import moment from "moment";
 
 import { Avatar, IconButton } from "@material-ui/core";
 import DonutLargeIcon from "@material-ui/icons/DonutLarge"
@@ -62,6 +63,15 @@ function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chat
         setFromChat(true)
         setChatOn()
     }
+
+    const sortConversation = () => {
+        const dateFormat = 'dddd, DD-MM-YYYY hh:mm:ss A'
+        try {
+            return conversationState.sort((a,b) => moment(b.messages[b.messages.length - 1].timestamp, dateFormat) - moment(a.messages[a.messages.length - 1].timestamp, dateFormat))
+        } catch (error) {
+            return conversationState
+        }
+    }
     
     return (
         <div className="sidebar">
@@ -104,7 +114,7 @@ function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chat
             </div>
 
             <div className="sidebar__chats">
-                {conversationState.map((data, index) => (
+                {sortConversation().map((data, index) => (
                     <SidebarChat 
                         key={index} 
                         conversation={data} 
