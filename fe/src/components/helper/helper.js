@@ -67,3 +67,9 @@ export const generateConversationID = (phoneNumber) => {
     let convID = getTimeStamp() + lastPhoneNumber + randomNumber
     return convID
 }
+
+export const createConversation = (payloadConversation) => {
+    const { conversation_id, group, recipients, message } = payloadConversation
+
+    return {conversation_id, group, recipients, messages: [message]}
+}
