@@ -24,6 +24,9 @@ import { setFromChat, setGroupChatStatus, setRecipientsChat, setRoomChatData, se
 function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chatState, setRoomChatData, setRoomChatID, setRecipientsChat, setGroupChatStatus, setFromChat}){
     const [option, setOption] = React.useState(false)
 
+    const user = JSON.parse(localStorage.getItem('whatsapp-mern-user'))
+    const avatar = user?.profile_id.fullname.split(' ').join('+') || user?.username
+
     const anchorRef = React.useRef(null);
 
     const handleClose = (event) => {
@@ -77,7 +80,11 @@ function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chat
         <div className="sidebar">
             
             <div className="sidebar__header">
-                <Avatar src="https://ui-avatars.com/api/?name=Ichsan+Kurniawan&background=0D8ABC&color=fff"/>
+                <div className='sidebar__headerLeft'>
+                    <Avatar src={`https://ui-avatars.com/api/?name=${avatar}&background=0D8ABC&color=fff`}/>
+                    <p>{user.username || user.profile_id.fullname}</p>
+                </div>
+
                 <div className="sidebar__headerRight">
                     <IconButton>
                         <DonutLargeIcon />

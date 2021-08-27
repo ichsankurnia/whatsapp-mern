@@ -8,7 +8,20 @@
 .sidebar__header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 20px;
+}
+
+.sidebar__headerLeft {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar__headerLeft > p {
+    font-weight: 500;
+    margin-left: 10px;
+    font-size: 15px;
 }
 
 .sidebar__headerRight {
