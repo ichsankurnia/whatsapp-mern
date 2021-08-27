@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // import Pusher from "pusher-js";
 import './App.css';
 
@@ -16,25 +16,19 @@ import { addConversation, addMessageToConversation, updateConversationID } from 
 
 import { useSocket } from '../contexts/SocketProvider';
 import { CircularProgress } from '@material-ui/core';
+import { createConversation } from './helper/helper';
 
 
-function Dashboard({id, globalState, userState, setContactList, setGroupList, setConversationList, conversationState, addConversation, addMessageToConversation, updateConversationID}) {
+function Dashboard({
+	id, 
+	globalState, userState, conversationState,
+	setContactList, setGroupList, setConversationList, 
+	addConversation, addMessageToConversation, updateConversationID
+}) {
 	// const [messages, setMessages] = useState([])
 	const [showLoader, setShowLoader] = useState(true)
 
 	const socket = useSocket()
-
-	
-	const addNewConversation = useCallback((payloadConversation) => {
-		addConversation(1, 3, createConversation(conversationState, payloadConversation))
-
-	}, [conversationState, addConversation])
-
-	const createConversation = (prevConversation, payloadConversation) => {
-        const { conversation_id, group, recipients, message } = payloadConversation
-
-        return [...prevConversation, {conversation_id, group, recipients, messages: [message]}]
-    }
 
 	useEffect(() => {
 		// axios.get("/messages/sync").then((res) => {
@@ -44,18 +38,6 @@ function Dashboard({id, globalState, userState, setContactList, setGroupList, se
 		if (socket == null) return
 
 		socket.emit('user-loggedin', localStorage.getItem('whatsapp-mern-user'))
-		
-		socket.on("handle", (data) => {
-			console.log(data)
-		})
-		
-		socket.on('sent', (data) => {
-			console.log(data)
-		})
-		
-		socket.on('message', (data) => {
-			console.log(data)
-		})
 
 		// socket.on('receive-message', (data) => {
 			// console.log(data)
@@ -74,7 +56,8 @@ function Dashboard({id, globalState, userState, setContactList, setGroupList, se
 					updateConversationID(conversation_id, recipients, message)
 					// addMessageToConversation(conversation_id, message)
 				}else{
-					addNewConversation(conversation)
+					// addNewConversation(conversation)
+					addConversation(createConversation(conversation))
 				}
 			}
 
@@ -94,7 +77,7 @@ function Dashboard({id, globalState, userState, setContactList, setGroupList, se
 			socket.off('add-group-res')
 		} 
 
-	}, [socket, userState.group_list, conversationState, addNewConversation, addMessageToConversation, updateConversationID, setGroupList])
+	}, [socket, userState.group_list, conversationState, addConversation, addMessageToConversation, updateConversationID, setGroupList])
 
 
 

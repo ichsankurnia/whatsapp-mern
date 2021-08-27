@@ -5,14 +5,9 @@ const conversationReducer = (state = initialState.conversations, action) => {
     // console.log(action)
     switch (action.type){
         case ActionTypeConversation.ADD_CONVERSATION:
-            // const newConversation = {
-            //     conversationId : action.id,
-            //     recipients : action.recipients,
-            //     message: []
-            // }
-            // const conversations = [...state, newConversation]
-            // return conversations
-            return action.new_conversation
+            const addNewConvers = [...state, action.new_conversation]
+            return addNewConvers
+            // return action.new_conversation
         case ActionTypeConversation.ADD_MESSAGE_TO_CONVERSATION:
             const indexConversation = state.findIndex((obj => obj.conversation_id === action.id))
             const conversations = [ ...state ]

@@ -16,7 +16,7 @@ import { addConversation, addMessageToConversation } from "../redux/action/conve
 
 import waOverview from './../assets/wa.png'
 import { useSocket } from "../contexts/SocketProvider";
-import { generateConversationID } from "./helper/helper";
+import { createConversation, generateConversationID } from "./helper/helper";
 
 moment.tz.setDefault("Asia/Jakarta");
 
@@ -96,7 +96,8 @@ function Chat({ /* messages, */userState, globalState, conversationState, addCon
 
                 setConversationID(chatState.room_chat_id)
                 payloadConversation.conversation_id = chatState.room_chat_id
-                addConversation(1, 3, createConversation(conversationState, payloadConversation))
+
+                addConversation(createConversation(payloadConversation))
             }
         }else{
             const filterConv = conversationState.filter(data => data.recipients.length === 1 && data.recipients[0] === chatState.recipients_chat[0])
@@ -118,18 +119,13 @@ function Chat({ /* messages, */userState, globalState, conversationState, addCon
                 setConversationID(conversationId)
                 setRoomChatID(conversationId)
                 payloadConversation.conversation_id = conversationId
-                addConversation(1, 3, createConversation(conversationState, payloadConversation))
+
+                addConversation(createConversation(payloadConversation))
             }
         }
         setMessages([...messages, payloadMessage])
 
         socket.emit('send-message', payloadConversation)
-    }
-
-    const createConversation = (prevConversation, payloadConversation) => {
-        const { conversation_id, group, recipients, message } = payloadConversation
-
-        return [...prevConversation, {conversation_id, group, recipients, messages: [message]}]
     }
 
 
