@@ -12,11 +12,9 @@ export const setConversationList = (listConversation) => {
     }
 }
 
-export const addConversation = (conversationId, recipients, newConversation) => {
+export const addConversation = (newConversation) => {
     return {
         type: ActionTypeConversation.ADD_CONVERSATION,
-        id: conversationId,
-        recipients,
         new_conversation: newConversation
     }
 }
