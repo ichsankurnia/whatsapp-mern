@@ -279,8 +279,20 @@ const addGroupMember = async (req, res) => {
         const findGroup = await Group.findOne({ 
             $or: [ { _id: objId }, { group_id }, ]
         })
-        
         if(!findGroup ) return res.status(404).json({code: 1, message: `group with id '${group_id} not found ☹️`, data: null})
+
+
+        let idGroupMember = []
+        await Promise.all(group_member.map(phone => {
+            idGroupMember.push(idPhoneNumber(phone))
+        }))
+
+        const found = findGroup.group_member.some(item => idGroupMember.includes(item))
+        if(found){
+            console.log(findGroup.group_member)
+            console.log(idGroupMember)
+            return res.status(400).json({code: 1, message: `a group member already exist in this group, try to exclude the group member ☹️`, data: null})
+        }
 
         await Promise.all(group_member.map(async (phoneNumber) => {
             await Group.findOneAndUpdate(
@@ -339,6 +351,16 @@ const removeGroupMember = async (req, res) => {
         })
         
         if(!findGroup ) return res.status(404).json({code: 1, message: `group with id '${group_id} not found ☹️`, data: null})
+
+        let idGroupMember = []
+        await Promise.all(group_member.map(phone => {
+            idGroupMember.push(idPhoneNumber(phone))
+        }))
+        
+        const found = findGroup.group_member.some(item => idGroupMember.includes(item))
+        if(!found){
+            return res.status(400).json({code: 1, message: `a group member doesn't exist in this group, try to include existing member ☹️`, data: null})
+        }
 
         await Promise.all(group_member.map(async (phoneNumber) => {
             await Group.findOneAndUpdate(
