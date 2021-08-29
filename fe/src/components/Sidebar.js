@@ -82,7 +82,7 @@ function Sidebar({setContactOnOff, setChatOn, userState, conversationState, chat
             <div className="sidebar__header">
                 <div className='sidebar__headerLeft'>
                     <Avatar src={`https://ui-avatars.com/api/?name=${avatar}&background=0D8ABC&color=fff`}/>
-                    <p>{user.username || user.profile_id.fullname}</p>
+                    <p>{user?.username || user?.profile_id?.fullname}</p>
                 </div>
 
                 <div className="sidebar__headerRight">
