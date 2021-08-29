@@ -26,29 +26,35 @@ function NewGroup({contactList, groupList, setGroupList, showNG}){
     }
 
     const handleAddNewGroup = async () => {
-        if(groupMember.length > 0){
-            console.log(groupMember)
+        if(groupName !== "" && groupName!==null && groupName!==undefined){
+            if(groupMember.length > 0){
+                if(groupMember.length > 1){
+                    try {
+                        const payload = {
+                            "group_id": generateConversationID(JSON.parse(localStorage.getItem('whatsapp-mern-user')).phone_number),
+                            "group_name": groupName,
+                            "group_desc": "",
+                            "group_photo": "",
+                            "group_member": [...groupMember, JSON.parse(localStorage.getItem('whatsapp-mern-user')).phone_number],
+                            "group_maker": JSON.parse(localStorage.getItem('whatsapp-mern-user'))._id
+                        }
             
-            try {
-                const payload = {
-                    "group_id": generateConversationID(JSON.parse(localStorage.getItem('whatsapp-mern-user')).phone_number),
-                    "group_name": groupName,
-                    "group_desc": "",
-                    "group_photo": "",
-                    "group_member": [...groupMember, JSON.parse(localStorage.getItem('whatsapp-mern-user')).phone_number],
-                    "group_maker": JSON.parse(localStorage.getItem('whatsapp-mern-user'))._id
+                        socket.emit('add-group', payload)
+                        setGroupList([...groupList, payload])
+            
+                        showNG(false)
+                    } catch (error) {
+                        if(error.response) alert(error.response.data.message)
+                        else alert(JSON.parse(JSON.stringify(error)).message)
+                    }
+                }else{
+                    alert('Cannot create group because group member is too small !')
                 }
-    
-                socket.emit('add-group', payload)
-                setGroupList([...groupList, payload])
-    
-                showNG(false)
-            } catch (error) {
-                if(error.response) alert(error.response.data.message)
-                else alert(JSON.parse(JSON.stringify(error)).message)
+            }else{
+                alert('Please select member of group first !')
             }
         }else{
-            alert('Please select member of group first !')
+            alert('Group name is required')
         }
     }
 
