@@ -16,7 +16,8 @@ import isAuthenticate from "./app/middlewares/verify-token.js"
 import { 
     addContact, 
     getContactbyUserId, 
-    deleteContact 
+    deleteContact, 
+    getContactWithoutDetail
 } from "./app/controllers/controller-contact.js";
 import { 
     deleteMessage, 
@@ -62,6 +63,7 @@ Router.patch('/user/profile/:profile_id', updateProfile)
 // Contact
 Router.get('/contact/:user_id', getContactbyUserId)
 Router.post('/contact', addContact)
+Router.get('/contact-only/:user_id', getContactWithoutDetail)
 Router.delete('/contact', deleteContact)
 
 
