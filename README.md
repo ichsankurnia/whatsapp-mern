@@ -1,2 +1,2 @@
 # whatsapp-mern
- Clone whatsapp apps using MERN stack (mongodb, expressjs, reactjs, nodejs)
+ Clone whatsapp apps using MERN stack (mongodb, expressjs, reactjs, nodejs) and socketio
